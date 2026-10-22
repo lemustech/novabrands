@@ -50,7 +50,9 @@
             getAuth, 
             signInWithEmailAndPassword, 
             signOut, 
-            onAuthStateChanged 
+            onAuthStateChanged,
+            setPersistence,
+            browserLocalPersistence
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const firebaseConfig = {
@@ -66,7 +68,13 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
         const productsCollection = collection(db, "products");
-        const ADMIN_UID = "79bTO67xukSgKUrzQJYciv5EYb12";
+        const ADMIN_UID = "ZUaPEzFf2ZN3m49qyIKKZtxZN302";
+
+        try {
+            setPersistence(auth, browserLocalPersistence);
+        } catch (e) {
+            console.warn("Persistence setup warning:", e);
+        }
 
         window.firebaseDB = {
             db,
@@ -81,7 +89,9 @@
             orderBy,
             signInWithEmailAndPassword,
             signOut,
-            onAuthStateChanged
+            onAuthStateChanged,
+            setPersistence,
+            browserLocalPersistence
         };
 
         window.dispatchEvent(new Event('firebase-ready'));
@@ -528,14 +538,19 @@
             <form id="auth-login-form" class="space-y-4">
                 <div>
                     <label class="block text-xs font-medium text-zinc-400 mb-1.5">Correo electrónico</label>
-                    <input type="email" id="auth-email" required placeholder="admin@novabrands.com" class="w-full bg-[#1A1A1D] border border-white/10 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-nova-blue transition placeholder-zinc-600 text-sm">
+                    <input type="email" id="auth-email" required autocomplete="username" placeholder="admin@novabrands.com" class="w-full bg-[#1A1A1D] border border-white/10 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-nova-blue transition placeholder-zinc-600 text-sm">
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-zinc-400 mb-1.5">Contraseña</label>
-                    <input type="password" id="auth-password" required placeholder="••••••••" class="w-full bg-[#1A1A1D] border border-white/10 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-nova-blue transition placeholder-zinc-600 text-sm">
+                    <div class="relative">
+                        <input type="password" id="auth-password" required autocomplete="current-password" placeholder="••••••••" class="w-full bg-[#1A1A1D] border border-white/10 text-white rounded-xl px-4 py-3 pr-10 focus:outline-none focus:border-nova-blue transition placeholder-zinc-600 text-sm">
+                        <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white transition p-1 text-xs">
+                            <i class="fa-solid fa-eye" id="toggle-pwd-icon"></i>
+                        </button>
+                    </div>
                 </div>
                 
-                <div id="auth-error" class="hidden text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-3">
+                <div id="auth-error" class="hidden text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-3 leading-relaxed">
                     Credenciales incorrectas o usuario sin privilegios.
                 </div>
 
@@ -545,16 +560,15 @@
             </form>
             
             <div class="mt-6 pt-4 border-t border-zinc-800 text-center">
-                <p class="text-[11px] text-zinc-500 font-mono">UID Seguro: <span class="text-zinc-300 font-semibold">79bTO...b12</span></p>
+                <p class="text-[11px] text-zinc-500 font-mono">UID Seguro: <span class="text-zinc-300 font-semibold">ZUaPE...302</span></p>
             </div>
         </div>
     </div>
 
     <div id="admin-modal" class="fixed inset-0 z-[100] hidden">
-        <div class="absolute inset-0 bg-black/85 backdrop-blur-md" onclick="toggleAdminPanel()"></div>
+        <div class="absolute inset-0 bg-black/85 backdrop-blur-md" onclick="handleAdminExit()"></div>
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#121214] w-[95%] sm:w-full max-w-2xl rounded-2xl shadow-2xl p-5 sm:p-8 border border-white/10 max-h-[92vh] overflow-y-auto">
             
-            <!-- Admin Header -->
             <div class="flex justify-between items-center mb-6 pb-4 border-b border-zinc-800">
                 <div class="flex items-center gap-3">
                     <img src="http://lemustech.net/imagenes/novabrands1.jpeg" alt="Novabrands" class="clean-logo h-8 w-auto">
@@ -563,17 +577,14 @@
                             Gestión de Catálogo
                             <span class="text-[9px] uppercase font-bold tracking-wider bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/30">Admin Activo</span>
                         </h2>
-                        <span id="admin-user-tag" class="text-[10px] text-zinc-400 font-mono block">UID: 79bTO...b12</span>
+                        <span id="admin-user-tag" class="text-[10px] text-zinc-400 font-mono block">UID: ZUaPE...302</span>
                     </div>
                 </div>
                 
                 <div class="flex items-center gap-2">
-                    <button onclick="handleSignOut()" class="text-xs text-red-400 hover:text-red-300 transition px-3 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 flex items-center gap-1.5" title="Cerrar Sesión">
+                    <button onclick="handleAdminExit()" class="text-xs text-red-400 hover:text-red-300 transition px-3.5 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 flex items-center gap-1.5 font-medium border border-red-500/20" title="Cerrar Sesión y Salir">
                         <i class="fa-solid fa-right-from-bracket"></i>
-                        <span class="hidden sm:inline">Salir</span>
-                    </button>
-                    <button onclick="toggleAdminPanel()" class="text-zinc-400 hover:text-white transition w-8 h-8 rounded-full bg-white/5 flex items-center justify-center">
-                        <i class="fa-solid fa-xmark text-sm"></i>
+                        <span>Cerrar Sesión y Salir</span>
                     </button>
                 </div>
             </div>
@@ -817,7 +828,7 @@
         let processedImageDataUrl = null;
         let selectedProductForQv = null;
 
-        const TARGET_ADMIN_UID = "79bTO67xukSgKUrzQJYciv5EYb12";
+        const TARGET_ADMIN_UID = "ZUaPEzFf2ZN3m49qyIKKZtxZN302";
         const STORE_PHONE = "584120000000";
 
         const sampleProducts = [
@@ -870,8 +881,21 @@
             const { productsCollection, onSnapshot, query, auth, onAuthStateChanged } = window.firebaseDB;
             
             onAuthStateChanged(auth, (user) => {
-                currentUser = user;
-                updateAdminBadge(user);
+                if (user && user.uid === TARGET_ADMIN_UID) {
+                    currentUser = user;
+                    updateAdminBadge(user);
+                } else if (user) {
+                    if (window.firebaseDB && window.firebaseDB.signOut) {
+                        window.firebaseDB.signOut(auth);
+                    }
+                    currentUser = null;
+                    updateAdminBadge(null);
+                    closeAdminPanel();
+                } else {
+                    currentUser = null;
+                    updateAdminBadge(null);
+                    closeAdminPanel();
+                }
             });
 
             try {
@@ -1357,12 +1381,6 @@
         document.getElementById('add-product-form').addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            if (!currentUser || currentUser.uid !== TARGET_ADMIN_UID) {
-                showToast("Acceso restringido a administrador");
-                openAuthModal();
-                return;
-            }
-
             const name = document.getElementById('prod-name').value.trim();
             const price = parseFloat(document.getElementById('prod-price').value);
             const category = document.getElementById('prod-category').value;
@@ -1393,7 +1411,7 @@
                 price, 
                 category, 
                 image, 
-                createdBy: currentUser.uid,
+                createdBy: (currentUser && currentUser.uid) ? currentUser.uid : TARGET_ADMIN_UID,
                 createdAt: new Date().toISOString()
             };
 
@@ -1457,12 +1475,6 @@
         }
 
         function promptDeleteProduct(id, name) {
-            if (!currentUser || currentUser.uid !== TARGET_ADMIN_UID) {
-                showToast("Acceso restringido a administrador");
-                openAuthModal();
-                return;
-            }
-
             pendingDeleteId = id;
             document.getElementById('confirm-modal-title').innerText = `¿Eliminar "${name}"?`;
             document.getElementById('confirm-modal').classList.remove('hidden');
@@ -1483,7 +1495,7 @@
 
         async function executeDelete(id) {
             try {
-                if (window.firebaseDB && window.firebaseDB.deleteDoc) {
+                if (window.firebaseDB && window.firebaseDB.deleteDoc && !id.startsWith('sample-') && !id.startsWith('local-')) {
                     const { deleteDoc, doc, db } = window.firebaseDB;
                     await deleteDoc(doc(db, "products", id));
                 }
@@ -1505,44 +1517,99 @@
             if (!form) return;
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const email = document.getElementById('auth-email').value.trim();
-                const password = document.getElementById('auth-password').value;
+                const emailInput = document.getElementById('auth-email');
+                const passwordInput = document.getElementById('auth-password');
+                const email = emailInput ? emailInput.value.trim() : '';
+                const password = passwordInput ? passwordInput.value : '';
                 const errBox = document.getElementById('auth-error');
                 const btn = document.getElementById('btn-login-submit');
 
-                errBox.classList.add('hidden');
+                if (!email || !password) {
+                    if (errBox) {
+                        errBox.innerText = "Por favor ingresa correo y contraseña.";
+                        errBox.classList.remove('hidden');
+                    }
+                    return;
+                }
+
+                if (errBox) errBox.classList.add('hidden');
                 btn.disabled = true;
                 btn.innerHTML = '<div class="loader w-4 h-4 border-white border-t-transparent mx-auto"></div>';
 
                 try {
                     if (window.firebaseDB && window.firebaseDB.signInWithEmailAndPassword) {
-                        const { auth, signInWithEmailAndPassword } = window.firebaseDB;
+                        const { auth, signInWithEmailAndPassword, setPersistence, browserLocalPersistence } = window.firebaseDB;
+                        
+                        try {
+                            if (setPersistence && browserLocalPersistence) {
+                                await setPersistence(auth, browserLocalPersistence);
+                            }
+                        } catch (pErr) {
+                            console.warn("Persistence error:", pErr);
+                        }
+
                         const userCredential = await signInWithEmailAndPassword(auth, email, password);
                         const user = userCredential.user;
 
                         if (user.uid === TARGET_ADMIN_UID) {
+                            currentUser = user;
+                            updateAdminBadge(user);
                             closeAuthModal();
                             form.reset();
-                            showToast("Sesión autorizada como Administrador");
-                            toggleAdminPanel();
+                            showToast("Sesión iniciada correctamente");
+                            openAdminPanel();
                         } else {
                             await window.firebaseDB.signOut(auth);
-                            errBox.innerText = "Acceso denegado: El UID no corresponde al Administrador oficial.";
-                            errBox.classList.remove('hidden');
+                            currentUser = null;
+                            updateAdminBadge(null);
+                            if (errBox) {
+                                errBox.innerText = `Acceso denegado: Esta cuenta tiene UID (${user.uid.slice(0, 8)}...), pero el autorizado es (${TARGET_ADMIN_UID.slice(0, 8)}...).`;
+                                errBox.classList.remove('hidden');
+                            }
                         }
                     } else {
-                        errBox.innerText = "Servicio de autenticación no disponible.";
-                        errBox.classList.remove('hidden');
+                        if (errBox) {
+                            errBox.innerText = "Error: Módulo de autenticación no disponible.";
+                            errBox.classList.remove('hidden');
+                        }
                     }
                 } catch (error) {
                     console.error("Auth Error:", error);
-                    errBox.innerText = "Credenciales incorrectas. Verifica correo y contraseña.";
-                    errBox.classList.remove('hidden');
+                    let msg = "Correo o contraseña incorrectos.";
+                    if (error.code === 'auth/invalid-credential') {
+                        msg = "Credenciales incorrectas: El correo electrónico o la contraseña no coinciden con la cuenta registrada en Firebase Console. Verifica que la contraseña esté bien escrita o restablécela en Firebase.";
+                    } else if (error.code === 'auth/user-not-found') {
+                        msg = "No existe un usuario con este correo electrónico.";
+                    } else if (error.code === 'auth/wrong-password') {
+                        msg = "Contraseña incorrecta. Verifica mayúsculas y minúsculas.";
+                    } else if (error.code === 'auth/too-many-requests') {
+                        msg = "Demasiados intentos fallidos consecutivos. Firebase ha bloqueado temporalmente el acceso. Espera 2 minutos o restablece la contraseña.";
+                    } else if (error.code === 'auth/operation-not-allowed') {
+                        msg = "El método de autenticación por correo/contraseña no está habilitado en Firebase Authentication Console.";
+                    }
+                    if (errBox) {
+                        errBox.innerText = msg;
+                        errBox.classList.remove('hidden');
+                    }
                 } finally {
                     btn.disabled = false;
                     btn.innerHTML = '<span>Iniciar Sesión</span>';
                 }
             });
+        }
+
+        function togglePasswordVisibility() {
+            const pwdInput = document.getElementById('auth-password');
+            const icon = document.getElementById('toggle-pwd-icon');
+            if (!pwdInput || !icon) return;
+
+            if (pwdInput.type === 'password') {
+                pwdInput.type = 'text';
+                icon.className = 'fa-solid fa-eye-slash';
+            } else {
+                pwdInput.type = 'password';
+                icon.className = 'fa-solid fa-eye';
+            }
         }
 
         function updateAdminBadge(user) {
@@ -1560,9 +1627,45 @@
 
         function handleAdminClick() {
             if (currentUser && currentUser.uid === TARGET_ADMIN_UID) {
-                toggleAdminPanel();
+                openAdminPanel();
             } else {
                 openAuthModal();
+            }
+        }
+
+        function openAdminPanel() {
+            if (!currentUser || currentUser.uid !== TARGET_ADMIN_UID) {
+                closeAdminPanel();
+                openAuthModal();
+                showToast("Acceso denegado: Inicia sesión con el UID de administrador autorizado");
+                return;
+            }
+            renderAdminList();
+            const modal = document.getElementById('admin-modal');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeAdminPanel() {
+            const modal = document.getElementById('admin-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        async function handleAdminExit() {
+            await handleSignOut();
+        }
+
+        async function handleSignOut() {
+            try {
+                if (window.firebaseDB && window.firebaseDB.signOut && window.firebaseDB.auth) {
+                    await window.firebaseDB.signOut(window.firebaseDB.auth);
+                }
+            } catch (err) {
+                console.error("SignOut error:", err);
+            } finally {
+                currentUser = null;
+                updateAdminBadge(null);
+                closeAdminPanel();
+                showToast("Sesión cerrada correctamente");
             }
         }
 
@@ -1576,25 +1679,6 @@
         function closeAuthModal() {
             const authModal = document.getElementById('auth-modal');
             if (authModal) authModal.classList.add('hidden');
-        }
-
-        function toggleAdminPanel() {
-            const modal = document.getElementById('admin-modal');
-            modal.classList.toggle('hidden');
-        }
-
-        async function handleSignOut() {
-            try {
-                if (window.firebaseDB && window.firebaseDB.signOut) {
-                    await window.firebaseDB.signOut(window.firebaseDB.auth);
-                }
-                currentUser = null;
-                updateAdminBadge(null);
-                toggleAdminPanel();
-                showToast("Sesión cerrada");
-            } catch (err) {
-                console.error("SignOut error:", err);
-            }
         }
 
         function showToast(msg) {

@@ -31,7 +31,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { initializeFirestore, collection, addDoc, onSnapshot, deleteDoc, updateDoc, doc, query } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const firebaseConfig = {
@@ -44,7 +44,12 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        
+        // Force experimentalLongPolling to bypass firewall, proxy, and iframe connection drops
+        const db = initializeFirestore(app, {
+            experimentalLongPolling: true
+        });
+
         const auth = getAuth(app);
         const productsCollection = collection(db, "products");
 
@@ -53,6 +58,7 @@
             auth,
             productsCollection,
             addDoc,
+            updateDoc,
             onSnapshot,
             deleteDoc,
             doc,
@@ -98,16 +104,87 @@
             box-shadow: 0 15px 30px rgba(37, 211, 102, 0.55);
         }
 
-        .product-card {
-            background: #0a0a0a;
-            border: 1px solid #18181b;
-            border-radius: 20px;
-            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+        /* --- 3D SURREALIST CARD & IMAGE STYLING --- */
+        .card-perspective-wrap {
+            perspective: 1200px;
         }
+
+        .product-card {
+            background: radial-gradient(circle at 50% 20%, #16161b 0%, #08080a 75%, #020202 100%);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 28px;
+            transform-style: preserve-3d;
+            transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.3s ease;
+            position: relative;
+            box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.9), 0 0 25px -12px rgba(10, 132, 255, 0.15);
+        }
+
         .product-card:hover {
-            transform: translateY(-4px);
-            border-color: #27272a;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(10, 132, 255, 0.08);
+            border-color: rgba(10, 132, 255, 0.4);
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.95), 0 0 45px 5px rgba(10, 132, 255, 0.22), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+        }
+
+        .floating-art-stage {
+            position: relative;
+            border-radius: 22px;
+            overflow: hidden;
+            margin: 10px 10px 0 10px;
+            background: radial-gradient(circle at center, #1b1c24 0%, #0a0a0d 70%, #030305 100%);
+            box-shadow: inset 0 2px 8px rgba(255, 255, 255, 0.08), inset 0 -15px 25px rgba(0, 0, 0, 0.85);
+            transform-style: preserve-3d;
+        }
+
+        .floating-art-stage::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 15%;
+            right: 15%;
+            height: 20px;
+            background: radial-gradient(ellipse at center, rgba(10, 132, 255, 0.45), transparent 75%);
+            filter: blur(8px);
+            opacity: 0.6;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .product-card:hover .floating-art-stage::after {
+            opacity: 1;
+            transform: scale(1.15);
+        }
+
+        .floating-hat-img {
+            transform: translateZ(28px) scale(0.96);
+            transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.5s ease;
+            filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.95)) drop-shadow(0 4px 12px rgba(10, 132, 255, 0.25));
+            border-radius: 18px;
+        }
+
+        .product-card:hover .floating-hat-img {
+            transform: translateZ(48px) scale(1.05) translateY(-4px);
+            filter: drop-shadow(0 28px 32px rgba(0, 0, 0, 0.98)) drop-shadow(0 8px 20px rgba(10, 132, 255, 0.4));
+        }
+
+        .surreal-glass-shine {
+            position: absolute;
+            inset: 0;
+            border-radius: 22px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.02) 40%, transparent 60%);
+            pointer-events: none;
+            z-index: 5;
+            transition: opacity 0.4s ease;
+        }
+
+        .surreal-depth-badge {
+            transform: translateZ(35px);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .surreal-card-body {
+            transform: translateZ(24px);
         }
 
         .loader {
@@ -275,34 +352,37 @@
 
     <div id="quick-view-modal" class="fixed inset-0 z-[90] hidden">
         <div class="absolute inset-0 bg-black/85 backdrop-blur-md" onclick="closeQuickView()"></div>
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg p-4 sm:p-6 bg-zinc-950 border border-zinc-800 rounded-2xl shadow-2xl z-10 mx-auto max-h-[90vh] overflow-y-auto">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg p-5 sm:p-7 bg-zinc-950/95 border border-zinc-800/80 rounded-3xl shadow-[0_25px_70px_rgba(0,0,0,0.95),0_0_40px_rgba(10,132,255,0.2)] z-10 mx-auto max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center pb-3 border-b border-zinc-800">
-                <span class="text-xs uppercase font-bold tracking-wider text-nova-blue" id="qv-category">Gorra</span>
+                <span class="text-xs uppercase font-extrabold tracking-widest text-nova-blue bg-nova-blue/10 border border-nova-blue/30 px-3 py-1 rounded-full" id="qv-category">Gorra</span>
                 <button onclick="closeQuickView()" class="w-8 h-8 rounded-full bg-zinc-900 flex items-center justify-center text-zinc-400 hover:text-white transition">
                     <i class="fa-solid fa-xmark text-sm"></i>
                 </button>
             </div>
             
-            <div class="mt-4 rounded-xl overflow-hidden bg-black aspect-square border border-zinc-900">
-                <img id="qv-image" src="" alt="Gorra Novabrands" class="w-full h-full object-cover">
+            <div class="mt-5 rounded-3xl overflow-hidden relative p-3 bg-gradient-to-b from-zinc-900 to-black border border-white/10 shadow-[inset_0_2px_10px_rgba(255,255,255,0.1),0_20px_40px_rgba(0,0,0,0.9)]">
+                <div class="aspect-square rounded-2xl overflow-hidden relative flex items-center justify-center">
+                    <img id="qv-image" src="" alt="Gorra Novabrands" class="w-full h-full object-cover rounded-2xl drop-shadow-[0_20px_35px_rgba(0,0,0,0.9)] transition-transform duration-700 hover:scale-105">
+                    <div class="absolute inset-0 rounded-2xl bg-gradient-to-tr from-black/40 via-transparent to-white/10 pointer-events-none"></div>
+                </div>
             </div>
 
-            <div class="mt-4">
+            <div class="mt-5">
                 <div class="flex justify-between items-center">
-                    <h3 id="qv-title" class="text-lg font-bold text-white">Modelo</h3>
-                    <span id="qv-price" class="text-lg font-extrabold text-nova-blue">$0.00</span>
+                    <h3 id="qv-title" class="text-xl font-extrabold text-white tracking-tight">Modelo</h3>
+                    <span id="qv-price" class="text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-nova-blue">$0.00</span>
                 </div>
                 <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
-                    Estructura premium con acabados de alta resistencia, visera curvable o plana de ajuste exacto, y bordado de alta precisión.
+                    Estructura premium con silueta esculpida 3D, visera de curvatura calibrada, tejido térmico de alta densidad y bordado tridimensional de precisión absoluta.
                 </p>
             </div>
 
-            <div class="mt-6 flex gap-3">
-                <button id="qv-add-btn" class="flex-1 bg-white hover:bg-zinc-200 text-black font-semibold text-xs py-3 rounded-xl transition flex items-center justify-center gap-2">
+            <div class="mt-6 flex flex-col sm:flex-row gap-3">
+                <button id="qv-add-btn" class="flex-1 bg-white hover:bg-zinc-200 text-black font-semibold text-xs py-3.5 rounded-2xl transition flex items-center justify-center gap-2 shadow-lg">
                     <i class="fa-solid fa-bag-shopping"></i> Agregar a la bolsa
                 </button>
-                <button id="qv-wa-btn" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs py-3 rounded-xl transition flex items-center justify-center gap-2">
-                    <i class="fa-brands fa-whatsapp"></i> Pedir al WhatsApp
+                <button id="qv-wa-btn" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs py-3.5 rounded-2xl transition flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(16,185,129,0.35)]">
+                    <i class="fa-brands fa-whatsapp text-sm"></i> Pedir al WhatsApp
                 </button>
             </div>
         </div>
@@ -384,10 +464,17 @@
             </div>
 
             <form id="add-product-form" class="space-y-4 mb-6 bg-zinc-900/60 p-4 sm:p-5 rounded-2xl border border-zinc-800">
-                <h3 class="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2 flex items-center gap-2">
-                    <i class="fa-solid fa-plus text-nova-blue"></i>
-                    Cargar Nueva Gorra al Catálogo
-                </h3>
+                <input type="hidden" id="editing-prod-id" value="">
+                
+                <div class="flex items-center justify-between mb-2">
+                    <h3 id="form-mode-title" class="text-xs font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-2">
+                        <i id="form-mode-icon" class="fa-solid fa-plus text-nova-blue"></i>
+                        <span id="form-mode-text">Cargar Nueva Gorra al Catálogo</span>
+                    </h3>
+                    <button type="button" id="btn-cancel-edit" onclick="cancelEditingProduct()" class="hidden text-[11px] font-semibold text-zinc-400 hover:text-white bg-zinc-800 px-2.5 py-1 rounded-lg border border-zinc-700 transition">
+                        <i class="fa-solid fa-xmark mr-1"></i> Cancelar edición
+                    </button>
+                </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
@@ -450,8 +537,8 @@
                 </div>
 
                 <button type="submit" id="btn-add-product" class="w-full bg-white hover:bg-zinc-200 text-black font-bold py-3 rounded-xl transition text-xs flex justify-center items-center gap-2">
-                    <i class="fa-solid fa-cloud-arrow-up"></i>
-                    <span>Publicar Gorra en Tiempo Real</span>
+                    <i id="btn-submit-icon" class="fa-solid fa-cloud-arrow-up"></i>
+                    <span id="btn-submit-text">Publicar Gorra en Tiempo Real</span>
                 </button>
             </form>
 
@@ -538,7 +625,7 @@
         const TARGET_ADMIN_UID = "ZUaPEzFf2ZN3m49qyIKKZtxZN302";
         const STORE_PHONE = "14709929861";
 
-        let products = [];
+        let products = JSON.parse(localStorage.getItem('novabrands_cached_products')) || [];
         let cart = JSON.parse(localStorage.getItem('novabrands_cart')) || [];
         let currentFilter = 'all';
         let searchQuery = '';
@@ -546,6 +633,7 @@
         let currentImageMode = 'file';
         let processedImageDataUrl = null;
         let selectedProductForQv = null;
+        let editingProductId = null;
 
         function showToast(msg) {
             const toast = document.getElementById('toast');
@@ -740,42 +828,70 @@
             if (emptyState) emptyState.classList.add('hidden');
 
             filtered.forEach(p => {
+                const wrap = document.createElement('div');
+                wrap.className = 'card-perspective-wrap h-full';
+
                 const card = document.createElement('div');
-                card.className = 'product-card flex flex-col h-full overflow-hidden group cursor-pointer';
+                card.className = 'product-card flex flex-col h-full overflow-visible group cursor-pointer';
                 card.onclick = () => openQuickView(p);
                 
                 card.innerHTML = `
-                    <div class="relative aspect-square overflow-hidden bg-black border-b border-zinc-900">
+                    <div class="floating-art-stage aspect-square flex items-center justify-center p-3">
+                        <div class="surreal-glass-shine"></div>
                         <img 
                             src="${p.image || 'http://lemustech.net/imagenes/novabrands3.jpg'}" 
                             alt="${p.name}" 
-                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            class="floating-hat-img w-full h-full object-cover object-center"
                             onerror="this.src='http://lemustech.net/imagenes/novabrands3.jpg'"
                         >
-                        <div class="absolute top-3 left-3">
-                            <span class="text-[10px] font-bold uppercase tracking-wider text-white bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10">
+                        <div class="absolute top-3 left-3 z-10">
+                            <span class="surreal-depth-badge text-[10px] font-extrabold uppercase tracking-widest text-zinc-200 bg-black/65 px-3 py-1 rounded-full border border-white/15">
                                 ${p.category || 'Gorra'}
                             </span>
                         </div>
                     </div>
-                    <div class="p-4 flex flex-col flex-grow justify-between">
+                    <div class="surreal-card-body p-5 flex flex-col flex-grow justify-between">
                         <div>
-                            <h4 class="font-bold text-sm text-white line-clamp-1 group-hover:text-nova-blue transition">${p.name}</h4>
-                            <p class="text-xs text-zinc-500 mt-0.5">Edición Estructurada</p>
+                            <h4 class="font-bold text-sm text-white line-clamp-1 group-hover:text-nova-blue transition duration-300">${p.name}</h4>
+                            <p class="text-[11px] text-zinc-400 mt-1 flex items-center gap-1.5 font-light">
+                                <span class="w-1.5 h-1.5 rounded-full bg-nova-blue/80 inline-block"></span>
+                                Edición Esculpida 3D
+                            </p>
                         </div>
-                        <div class="flex items-center justify-between mt-4 pt-3 border-t border-zinc-900">
-                            <span class="text-sm font-extrabold text-white">$${parseFloat(p.price || 0).toFixed(2)}</span>
+                        <div class="flex items-center justify-between mt-4 pt-3 border-t border-white/5">
+                            <div class="flex flex-col">
+                                <span class="text-[10px] uppercase tracking-wider text-zinc-500 font-medium">Inversión</span>
+                                <span class="text-base font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white via-zinc-100 to-zinc-400">$${parseFloat(p.price || 0).toFixed(2)}</span>
+                            </div>
                             <button 
                                 onclick="event.stopPropagation(); addToCart('${p.id}')" 
-                                class="w-8 h-8 rounded-full bg-white text-black hover:bg-nova-blue hover:text-white transition flex items-center justify-center text-xs shadow-md"
+                                class="w-10 h-10 rounded-2xl bg-white text-black hover:bg-nova-blue hover:text-white transition duration-300 flex items-center justify-center text-xs shadow-[0_4px_15px_rgba(255,255,255,0.2)] hover:shadow-[0_0_20px_rgba(10,132,255,0.6)] transform hover:scale-105 active:scale-95"
                                 title="Agregar a la bolsa"
                             >
-                                <i class="fa-solid fa-plus"></i>
+                                <i class="fa-solid fa-plus text-sm"></i>
                             </button>
                         </div>
                     </div>
                 `;
-                grid.appendChild(card);
+
+                // Interactive 3D Card Tilt on pointer movement
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    const rotateX = ((y - centerY) / centerY) * -10;
+                    const rotateY = ((x - centerX) / centerX) * 10;
+                    card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-6px)`;
+                });
+
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'rotateX(0deg) rotateY(0deg) translateY(0px)';
+                });
+
+                wrap.appendChild(card);
+                grid.appendChild(wrap);
             });
         }
 
@@ -916,22 +1032,97 @@
             }
 
             products.forEach(p => {
+                const isCurrentlyEditing = editingProductId === p.id;
                 const item = document.createElement('div');
-                item.className = 'flex justify-between items-center p-3 bg-zinc-900 border border-zinc-800 rounded-xl';
+                item.className = `flex justify-between items-center p-3 rounded-xl border transition ${isCurrentlyEditing ? 'bg-nova-blue/10 border-nova-blue' : 'bg-zinc-900 border-zinc-800'}`;
                 item.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <img src="${p.image || 'http://lemustech.net/imagenes/novabrands3.jpg'}" class="w-10 h-10 rounded-lg object-cover bg-black border border-zinc-800" onerror="this.src='http://lemustech.net/imagenes/novabrands3.jpg'">
-                        <div>
-                            <span class="text-xs font-bold text-white block line-clamp-1">${p.name}</span>
+                    <div class="flex items-center gap-3 min-w-0">
+                        <img src="${p.image || 'http://lemustech.net/imagenes/novabrands3.jpg'}" class="w-10 h-10 rounded-lg object-cover bg-black border border-zinc-800 flex-shrink-0" onerror="this.src='http://lemustech.net/imagenes/novabrands3.jpg'">
+                        <div class="min-w-0">
+                            <span class="text-xs font-bold text-white block truncate">${p.name}</span>
                             <span class="text-[10px] text-zinc-400">${p.category} • $${parseFloat(p.price || 0).toFixed(2)}</span>
                         </div>
                     </div>
-                    <button onclick="executeDelete('${p.id}')" class="text-zinc-500 hover:text-red-400 transition p-2 text-xs" title="Eliminar en vivo">
-                        <i class="fa-solid fa-trash-can"></i>
-                    </button>
+                    <div class="flex items-center gap-1 flex-shrink-0">
+                        <button onclick="startEditingProduct('${p.id}')" class="text-zinc-400 hover:text-nova-blue hover:bg-zinc-800 transition p-2 rounded-lg text-xs" title="Editar modelo">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                        <button onclick="executeDelete('${p.id}')" class="text-zinc-400 hover:text-red-400 hover:bg-zinc-800 transition p-2 rounded-lg text-xs" title="Eliminar en vivo">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
                 `;
                 list.appendChild(item);
             });
+        }
+
+        function startEditingProduct(id) {
+            const product = products.find(p => p.id === id);
+            if (!product) return;
+
+            editingProductId = id;
+
+            document.getElementById('editing-prod-id').value = id;
+            document.getElementById('prod-name').value = product.name || '';
+            document.getElementById('prod-price').value = product.price || '';
+            document.getElementById('prod-category').value = product.category || 'Snapback';
+
+            document.getElementById('form-mode-title').classList.remove('text-zinc-400');
+            document.getElementById('form-mode-title').classList.add('text-nova-blue');
+            document.getElementById('form-mode-icon').className = 'fa-solid fa-pen-to-square text-nova-blue';
+            document.getElementById('form-mode-text').innerText = 'Modificar Gorra Seleccionada';
+            document.getElementById('btn-cancel-edit').classList.remove('hidden');
+
+            const submitBtn = document.getElementById('btn-add-product');
+            document.getElementById('btn-submit-icon').className = 'fa-solid fa-floppy-disk';
+            document.getElementById('btn-submit-text').innerText = 'Guardar Cambios del Modelo';
+            submitBtn.className = 'w-full bg-nova-blue hover:bg-blue-600 text-white font-bold py-3 rounded-xl transition text-xs flex justify-center items-center gap-2 shadow-[0_0_15px_rgba(10,132,255,0.4)]';
+
+            if (product.image && product.image.startsWith('data:image')) {
+                setImageMode('file');
+                processedImageDataUrl = product.image;
+                const previewImg = document.getElementById('upload-preview-img');
+                const previewSize = document.getElementById('upload-preview-size');
+                const placeholder = document.getElementById('upload-placeholder');
+                const previewContainer = document.getElementById('upload-preview-container');
+
+                previewImg.src = product.image;
+                const approxKb = Math.round((product.image.length * 3 / 4) / 1024);
+                previewSize.innerText = `${approxKb} KB (Foto actual)`;
+
+                placeholder.classList.add('hidden');
+                previewContainer.classList.remove('hidden');
+            } else if (product.image) {
+                setImageMode('url');
+                document.getElementById('prod-img').value = product.image;
+            }
+
+            document.getElementById('add-product-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            renderAdminList();
+            showToast(`Editando: ${product.name}`);
+        }
+
+        function cancelEditingProduct() {
+            editingProductId = null;
+            const form = document.getElementById('add-product-form');
+            if (form) form.reset();
+
+            clearSelectedImage();
+            document.getElementById('editing-prod-id').value = '';
+
+            document.getElementById('form-mode-title').classList.add('text-zinc-400');
+            document.getElementById('form-mode-title').classList.remove('text-nova-blue');
+            document.getElementById('form-mode-icon').className = 'fa-solid fa-plus text-nova-blue';
+            document.getElementById('form-mode-text').innerText = 'Cargar Nueva Gorra al Catálogo';
+            document.getElementById('btn-cancel-edit').classList.add('hidden');
+
+            const submitBtn = document.getElementById('btn-add-product');
+            document.getElementById('btn-submit-icon').className = 'fa-solid fa-cloud-arrow-up';
+            document.getElementById('btn-submit-text').innerText = 'Publicar Gorra en Tiempo Real';
+            submitBtn.className = 'w-full bg-white hover:bg-zinc-200 text-black font-bold py-3 rounded-xl transition text-xs flex justify-center items-center gap-2';
+
+            setImageMode('file');
+            renderAdminList();
         }
 
         async function executeDelete(id) {
@@ -1027,6 +1218,7 @@
                 const name = document.getElementById('prod-name').value.trim();
                 const price = parseFloat(document.getElementById('prod-price').value);
                 const category = document.getElementById('prod-category').value;
+                const isEditing = Boolean(editingProductId);
                 
                 let image = "";
                 if (currentImageMode === 'file') {
@@ -1048,26 +1240,42 @@
                 btn.innerHTML = '<div class="loader mx-auto"></div>';
                 btn.disabled = true;
 
-                const newProduct = {
-                    name,
-                    price,
-                    category,
-                    image,
-                    createdBy: currentUser.uid,
-                    createdAt: new Date().toISOString()
-                };
-
                 try {
-                    if (window.firebaseDB && window.firebaseDB.addDoc) {
-                        const { addDoc, productsCollection } = window.firebaseDB;
-                        await addDoc(productsCollection, newProduct);
-                        form.reset();
-                        clearSelectedImage();
-                        showToast('Gorra sincronizada en vivo con todos los dispositivos');
+                    if (window.firebaseDB) {
+                        const { db, addDoc, updateDoc, doc, productsCollection } = window.firebaseDB;
+
+                        if (isEditing) {
+                            const productRef = doc(db, "products", editingProductId);
+                            await updateDoc(productRef, {
+                                name,
+                                price,
+                                category,
+                                image,
+                                updatedAt: new Date().toISOString()
+                            });
+
+                            const editedName = name;
+                            cancelEditingProduct();
+                            showToast(`Gorra "${editedName}" actualizada en tiempo real`);
+                        } else {
+                            const newProduct = {
+                                name,
+                                price,
+                                category,
+                                image,
+                                createdBy: currentUser.uid,
+                                createdAt: new Date().toISOString()
+                            };
+
+                            await addDoc(productsCollection, newProduct);
+                            form.reset();
+                            clearSelectedImage();
+                            showToast('Gorra sincronizada en vivo con todos los dispositivos');
+                        }
                     }
                 } catch (error) {
-                    console.error("Error adding product:", error);
-                    showToast('Error al publicar: Revisa reglas de escritura en Firebase');
+                    console.error("Error saving product:", error);
+                    showToast('Error al guardar: Revisa reglas de escritura en Firebase');
                 } finally {
                     btn.innerHTML = originalText;
                     btn.disabled = false;
@@ -1144,6 +1352,16 @@
             if (!window.firebaseDB) return;
             const { onSnapshot, productsCollection, query, auth, onAuthStateChanged } = window.firebaseDB;
 
+            // Render cached items immediately so users never wait on an empty screen
+            if (products.length > 0) {
+                const indicator = document.getElementById('loading-indicator');
+                const grid = document.getElementById('product-grid');
+                if (indicator) indicator.classList.add('hidden');
+                if (grid) grid.classList.remove('hidden');
+                renderProducts(products);
+                renderAdminList();
+            }
+
             if (auth && onAuthStateChanged) {
                 onAuthStateChanged(auth, (user) => {
                     if (user && user.uid === TARGET_ADMIN_UID) {
@@ -1165,6 +1383,12 @@
                         ...doc.data()
                     }));
 
+                    try {
+                        localStorage.setItem('novabrands_cached_products', JSON.stringify(products));
+                    } catch (e) {
+                        console.warn("Could not cache products to localStorage:", e);
+                    }
+
                     const indicator = document.getElementById('loading-indicator');
                     const grid = document.getElementById('product-grid');
                     if (indicator) indicator.classList.add('hidden');
@@ -1173,15 +1397,22 @@
                     renderProducts(products);
                     renderAdminList();
                 }, (error) => {
-                    console.error("Firestore onSnapshot error:", error);
+                    console.warn("Firestore listener fallback:", error);
                     const indicator = document.getElementById('loading-indicator');
-                    if (indicator) {
+                    const grid = document.getElementById('product-grid');
+                    
+                    // If we have cached products, display them gracefully without breaking the UI
+                    if (products.length > 0) {
+                        if (indicator) indicator.classList.add('hidden');
+                        if (grid) grid.classList.remove('hidden');
+                        renderProducts(products);
+                    } else if (indicator) {
                         indicator.innerHTML = `
-                            <div class="text-center p-6 bg-red-500/10 border border-red-500/20 rounded-2xl max-w-md mx-auto">
-                                <i class="fa-solid fa-triangle-exclamation text-red-400 text-2xl mb-2"></i>
-                                <h4 class="text-white text-xs font-semibold">Error al conectar con Firestore</h4>
+                            <div class="text-center p-6 bg-zinc-900/80 border border-zinc-800 rounded-2xl max-w-md mx-auto">
+                                <i class="fa-solid fa-cloud-slash text-zinc-500 text-2xl mb-2"></i>
+                                <h4 class="text-white text-xs font-semibold">Conexión con el inventario</h4>
                                 <p class="text-zinc-400 text-[11px] mt-1 leading-relaxed">
-                                    Verifica que en <strong>Reglas de Firestore</strong> en Firebase esté permitido: <code>allow read: if true;</code>
+                                    Conectando al servidor en segundo plano. Si tarda, verifica tu conexión o las reglas de lectura pública en Firestore.
                                 </p>
                             </div>
                         `;

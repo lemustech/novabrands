@@ -2,58 +2,37 @@
 <html lang="es" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>Novabrands | Premium Headwear Culture</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novabrands | Premium Headwear</title>
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        oled: {
-                            base: '#000000',
-                            card: '#0A0A0A',
-                            surface: '#121214',
-                            border: '#1F1F22',
-                            hover: '#26262B'
-                        },
-                        nova: {
-                            blue: '#0A84FF',
-                            accent: '#2997FF',
-                            darkBlue: '#0058b8',
-                            gold: '#FFD60A'
-                        }
+                        'oled-black': '#000000',
+                        'oled-card': '#0a0a0a',
+                        'oled-border': '#18181b',
+                        'nova-blue': '#0A84FF',
                     },
                     screens: {
-                        'xs': '420px'
+                        'xs': '480px',
                     }
                 }
             }
         }
     </script>
     
-    <!-- Google Fonts: Inter & Outfit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-
-    <!-- Firebase SDKs (Modular) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { 
-            getAuth, 
-            signInWithEmailAndPassword, 
-            signOut, 
-            onAuthStateChanged,
-            setPersistence,
-            browserLocalPersistence
-        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDHTkk22y_rL8qsmkCQ16jHNcZn_3l2oPM",
@@ -68,1097 +47,517 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
         const productsCollection = collection(db, "products");
-        const ADMIN_UID = "ZUaPEzFf2ZN3m49qyIKKZtxZN302";
-
-        try {
-            setPersistence(auth, browserLocalPersistence);
-        } catch (e) {
-            console.warn("Persistence setup warning:", e);
-        }
 
         window.firebaseDB = {
             db,
             auth,
-            ADMIN_UID,
             productsCollection,
             addDoc,
             onSnapshot,
             deleteDoc,
             doc,
             query,
-            orderBy,
             signInWithEmailAndPassword,
             signOut,
-            onAuthStateChanged,
-            setPersistence,
-            browserLocalPersistence
+            onAuthStateChanged
         };
 
         window.dispatchEvent(new Event('firebase-ready'));
     </script>
 
     <style>
-        :root {
-            --oled-black: #000000;
-            --oled-card: #0A0A0A;
-            --oled-border: #1F1F22;
-            --text-main: #FFFFFF;
-            --text-muted: #8E8E93;
-            --accent-blue: #0A84FF;
-        }
-
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: var(--oled-black);
-            color: var(--text-main);
+            background-color: #000000;
+            color: #ffffff;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
-            text-rendering: optimizeLegibility;
-            padding-bottom: env(safe-area-inset-bottom);
-        }
-
-        .heading-font {
-            font-family: 'Outfit', sans-serif;
-            letter-spacing: -0.03em;
         }
 
         .glass-nav {
-            background: rgba(0, 0, 0, 0.82);
-            backdrop-filter: saturate(190%) blur(22px);
-            -webkit-backdrop-filter: saturate(190%) blur(22px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        .glass-panel {
-            background: rgba(14, 14, 17, 0.85);
-            backdrop-filter: saturate(180%) blur(24px);
-            -webkit-backdrop-filter: saturate(180%) blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .btn-oled {
-            background: linear-gradient(135deg, #0A84FF 0%, #0060DF 100%);
-            color: white;
-            border-radius: 980px;
-            transition: all 0.28s cubic-bezier(0.25, 1, 0.5, 1);
-            box-shadow: 0 4px 20px rgba(10, 132, 255, 0.28);
-        }
-        .btn-oled:hover {
-            transform: translateY(-1px) scale(1.015);
-            box-shadow: 0 8px 30px rgba(10, 132, 255, 0.45);
-        }
-        .btn-oled:active {
-            transform: scale(0.98);
-        }
-
-        .btn-secondary {
-            background: #18181B;
-            color: #E4E4E7;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 980px;
-            transition: all 0.2s ease;
-        }
-        .btn-secondary:hover {
-            background: #27272A;
-            color: #FFFFFF;
-            border-color: rgba(255, 255, 255, 0.16);
+        .clean-logo {
+            background: transparent !important;
+            border: none !important;
+            padding: 0 !important;
+            box-shadow: none !important;
         }
 
         .product-card {
-            background: var(--oled-card);
-            border: 1px solid var(--oled-border);
+            background: #0a0a0a;
+            border: 1px solid #18181b;
             border-radius: 20px;
-            transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s ease, border-color 0.25s;
-            position: relative;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.3s ease;
         }
         .product-card:hover {
             transform: translateY(-4px);
-            border-color: rgba(255, 255, 255, 0.22);
-            box-shadow: 0 24px 50px -10px rgba(0, 0, 0, 0.9);
+            border-color: #27272a;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(10, 132, 255, 0.08);
         }
-
-        /* Clean logo styling without frames */
-        .clean-logo {
-            border: none !important;
-            background: transparent !important;
-            padding: 0 !important;
-            outline: none !important;
-            box-shadow: none !important;
-            display: inline-block;
-        }
-
-        /* Responsive custom scrollbars */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: var(--oled-black); }
-        ::-webkit-scrollbar-thumb { background: #27272A; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #3F3F46; }
-
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
         .loader {
-            border: 2.5px solid #27272A;
+            border: 2px solid #27272a;
             border-radius: 50%;
-            border-top: 2.5px solid var(--accent-blue);
-            width: 22px;
-            height: 22px;
-            animation: spin 0.9s cubic-bezier(0.6, 0.2, 0.4, 0.8) infinite;
+            border-top: 2px solid #0A84FF;
+            width: 20px;
+            height: 20px;
+            animation: spin 0.8s linear infinite;
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
 
-        .fade-in {
-            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        @keyframes shimmerLight {
+            0% { transform: translateX(-150%) skewX(-20deg); opacity: 0; }
+            30% { opacity: 0.45; }
+            70% { opacity: 0.45; }
+            100% { transform: translateX(250%) skewX(-20deg); opacity: 0; }
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes pulseScale {
+            0% { transform: scale(1); filter: contrast(100%) brightness(100%); }
+            50% { transform: scale(1.03); filter: contrast(105%) brightness(106%); }
+            100% { transform: scale(1); filter: contrast(100%) brightness(100%); }
         }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #000000; }
+        ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 3px; }
     </style>
 </head>
-<body class="antialiased min-h-screen flex flex-col selection:bg-nova-blue selection:text-white">
+<body class="min-h-screen flex flex-col bg-black text-white antialiased">
 
-    <!-- Sticky Navigation -->
-    <nav class="glass-nav fixed w-full top-0 z-50 h-16 md:h-18 flex items-center transition-all duration-300" id="main-nav">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center max-w-7xl">
+    <nav class="glass-nav fixed w-full top-0 z-50 h-16 flex items-center transition-all">
+        <div class="container mx-auto px-4 sm:px-6 flex justify-between items-center max-w-7xl">
+            <a href="#" class="flex items-center gap-3 select-none">
+                <img src="http://lemustech.net/imagenes/novabrands1.jpeg" alt="Novabrands Logo" class="h-8 w-auto object-contain clean-logo" onerror="this.onerror=null; this.src='https://placehold.co/120x40/000000/ffffff?text=NOVABRANDS'">
+                <span class="font-extrabold text-lg tracking-tight text-white hidden xs:inline">Novabrands</span>
+            </a>
             
-            <!-- Logo & Brand Name -->
-            <div class="flex items-center gap-3 cursor-pointer group" onclick="window.scrollTo({top:0, behavior:'smooth'})">
-                <img src="http://lemustech.net/imagenes/novabrands1.jpeg" alt="Novabrands Logo" class="clean-logo h-8 sm:h-9 w-auto object-contain transition-transform duration-300 group-hover:scale-105">
-                <span class="heading-font font-bold text-lg sm:text-xl tracking-tight text-white">Novabrands</span>
-            </div>
-            
-            <!-- Desktop Nav Links -->
-            <div class="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-400">
-                <a href="#shop-section" class="hover:text-white transition duration-200">Catálogo</a>
-                <a href="#featured-section" class="hover:text-white transition duration-200">Destacados</a>
-                <a href="#experience-section" class="hover:text-white transition duration-200">Calidad</a>
-                <a href="#faq-section" class="hover:text-white transition duration-200">Preguntas</a>
+            <div class="hidden md:flex items-center gap-8 text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                <a href="#shop-section" class="hover:text-white transition">Colección</a>
+                <a href="#special-edition" class="hover:text-white transition">Edición Especial</a>
+                <a href="https://wa.me/584120000000" target="_blank" class="hover:text-white transition">Contacto</a>
             </div>
 
-            <!-- Action Controls -->
-            <div class="flex items-center gap-3 sm:gap-4">
-                
-                <!-- Quick Search Toggle (Mobile/Desktop) -->
-                <button onclick="focusSearchInput()" aria-label="Buscar gorras" class="text-zinc-400 hover:text-white transition p-2 rounded-full hover:bg-white/5 active:scale-95">
-                    <i class="fa-solid fa-magnifying-glass text-base"></i>
-                </button>
-
-                <!-- Cart Button -->
-                <button onclick="toggleCart()" aria-label="Abrir bolsa de compra" class="relative text-white hover:text-nova-blue transition p-2 rounded-full hover:bg-white/5 active:scale-95">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleCart()" class="relative p-2 text-zinc-300 hover:text-white transition" aria-label="Ver Bolsa de Compras">
                     <i class="fa-solid fa-bag-shopping text-xl"></i>
-                    <span id="cart-count" class="absolute -top-1 -right-1 bg-nova-blue text-white text-[11px] font-bold w-5 h-5 flex items-center justify-center rounded-full opacity-0 transition-all duration-300 shadow-[0_0_12px_rgba(10,132,255,0.7)] scale-90">0</span>
+                    <span id="cart-count" class="absolute top-0 right-0 bg-nova-blue text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center opacity-0 transition-opacity shadow-[0_0_10px_rgba(10,132,255,0.6)]">0</span>
                 </button>
-
-                <!-- Mobile Hamburger Toggle -->
-                <button onclick="toggleMobileNav()" aria-label="Menú principal" class="md:hidden text-zinc-400 hover:text-white transition p-2 rounded-lg hover:bg-white/5 focus:outline-none">
-                    <i class="fa-solid fa-bars-staggered text-lg" id="mobile-menu-icon"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- Mobile Dropdown Navigation Menu -->
-        <div id="mobile-nav-panel" class="md:hidden hidden absolute top-16 left-0 w-full bg-black/95 border-b border-zinc-800/80 px-6 py-6 transition-all backdrop-blur-2xl">
-            <div class="flex flex-col gap-4 text-base font-medium text-zinc-300">
-                <a href="#shop-section" onclick="toggleMobileNav()" class="py-2 border-b border-zinc-800/50 flex justify-between items-center hover:text-white">
-                    <span>Catálogo Completo</span>
-                    <i class="fa-solid fa-arrow-right text-xs text-zinc-500"></i>
-                </a>
-                <a href="#featured-section" onclick="toggleMobileNav()" class="py-2 border-b border-zinc-800/50 flex justify-between items-center hover:text-white">
-                    <span>Colección Exclusiva</span>
-                    <i class="fa-solid fa-arrow-right text-xs text-zinc-500"></i>
-                </a>
-                <a href="#experience-section" onclick="toggleMobileNav()" class="py-2 border-b border-zinc-800/50 flex justify-between items-center hover:text-white">
-                    <span>Garantía y Materiales</span>
-                    <i class="fa-solid fa-arrow-right text-xs text-zinc-500"></i>
-                </a>
-                <a href="#faq-section" onclick="toggleMobileNav()" class="py-2 flex justify-between items-center hover:text-white">
-                    <span>Atención & Envíos</span>
-                    <i class="fa-solid fa-arrow-right text-xs text-zinc-500"></i>
-                </a>
-            </div>
-            <div class="mt-6 pt-4 border-t border-zinc-800 flex justify-between items-center text-xs text-zinc-400">
-                <span>Ventas directas & envíos exprés</span>
-                <span class="text-emerald-400 flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> En línea</span>
             </div>
         </div>
     </nav>
 
-    <header class="pt-28 pb-14 sm:pt-36 sm:pb-20 md:pt-40 md:pb-24 px-4 text-center relative overflow-hidden">
-        <!-- Ambient Radial Glow -->
-        <div class="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] sm:w-[500px] md:w-[750px] h-[320px] sm:h-[500px] md:h-[750px] bg-nova-blue/15 blur-[120px] md:blur-[160px] rounded-full pointer-events-none"></div>
+    <header class="pt-28 pb-12 sm:pt-36 sm:pb-16 px-4 text-center relative overflow-hidden">
+        <div class="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] sm:w-[600px] h-[350px] sm:h-[600px] bg-nova-blue/10 rounded-full blur-[120px] pointer-events-none"></div>
 
-        <div class="max-w-4xl mx-auto relative z-10 px-2 sm:px-4">
+        <div class="max-w-4xl mx-auto relative z-10 px-2">
+            <div class="flex justify-center mb-6">
+                <img src="http://lemustech.net/imagenes/novabrands2.jpeg" alt="Novabrands Emblem" class="h-16 sm:h-20 w-auto object-contain clean-logo" onerror="this.onerror=null; this.src='https://placehold.co/80x80/000000/ffffff?text=NB'">
+            </div>
             
-            <!-- Clean Hero Logo -->
-            <div class="flex justify-center mb-6 sm:mb-8">
-                <img src="http://lemustech.net/imagenes/novabrands2.jpeg" alt="Novabrands Emblem" class="clean-logo h-20 sm:h-24 md:h-28 w-auto object-contain transition-transform hover:scale-105 duration-300">
-            </div>
-
-            <!-- Value Proposition -->
-            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs sm:text-sm text-zinc-300 mb-6 backdrop-blur-md">
-                <span class="w-2 h-2 rounded-full bg-nova-blue animate-pulse"></span>
-                <span>Nueva Colección 2026 Disponible</span>
-            </div>
-
-            <h1 class="heading-font text-4xl sm:text-6xl md:text-7xl font-extrabold text-white mb-6 tracking-tight leading-[1.1] sm:leading-[1.15]">
+            <h1 class="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white leading-tight">
                 Estilo Definido.<br>
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-zinc-200 to-zinc-500">
-                    Calidad Sin Fronteras.
-                </span>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-zinc-200 to-zinc-500">Calidad Superior.</span>
             </h1>
-
-            <p class="text-sm sm:text-lg md:text-xl text-zinc-400 font-normal max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed px-2">
-                Descubre siluetas estructuradas con bordados tridimensionales de precisión y tejidos seleccionados de alta durabilidad.
+            
+            <p class="text-sm sm:text-base md:text-lg text-zinc-400 font-light max-w-xl mx-auto mt-4 leading-relaxed">
+                Headwear estructurado de alta gama. Diseñado para ofrecer durabilidad y presencia impecable.
             </p>
 
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 max-w-md mx-auto">
-                <button onclick="scrollToCatalog()" class="w-full sm:w-auto btn-oled px-8 py-3.5 text-sm sm:text-base font-semibold flex items-center justify-center gap-2.5">
-                    <span>Explorar Catálogo</span>
-                    <i class="fa-solid fa-arrow-down text-xs"></i>
-                </button>
-                <a href="#experience-section" class="w-full sm:w-auto btn-secondary px-7 py-3.5 text-sm sm:text-base font-medium flex items-center justify-center gap-2">
-                    <span>Conocer Materiales</span>
+            <div class="mt-8 flex flex-wrap justify-center gap-3">
+                <a href="#shop-section" class="bg-white text-black font-semibold text-xs sm:text-sm px-6 py-3 rounded-full hover:bg-zinc-200 transition shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+                    Explorar Modelos
+                </a>
+                <a href="#special-edition" class="bg-zinc-900 border border-white/10 text-white font-medium text-xs sm:text-sm px-6 py-3 rounded-full hover:bg-zinc-800 transition">
+                    Ver Exclusiva
                 </a>
             </div>
         </div>
-        
-        <!-- Hero Responsive Product Showcase -->
-        <div class="mt-12 sm:mt-16 relative max-w-5xl mx-auto px-2 sm:px-4">
+
+        <div id="special-edition" class="mt-12 sm:mt-16 relative max-w-5xl mx-auto px-2 sm:px-4">
             <div class="relative group rounded-2xl sm:rounded-3xl overflow-hidden border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.9)] bg-zinc-950">
-                <img 
-                    src="http://lemustech.net/imagenes/novabrands3.jpg" 
-                    id="hero-image" 
-                    alt="Novabrands Hero Hat Showcase" 
-                    class="w-full h-[280px] xs:h-[350px] sm:h-[440px] md:h-[520px] object-cover object-center transition-transform duration-700 group-hover:scale-105"
-                    onerror="this.src='https://images.unsplash.com/photo-1588850611197-4e6c1148b790?q=80&w=1200&auto=format&fit=crop'"
-                >
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-5 sm:p-8">
-                    <div class="text-left">
-                        <span class="text-[11px] font-semibold uppercase tracking-wider text-nova-blue bg-nova-blue/10 px-2.5 py-1 rounded-md border border-nova-blue/20">Edición Especial</span>
-                        <h2 class="text-xl sm:text-2xl font-bold text-white mt-1">Colección Limitada Dark Stealth</h2>
+                <div class="relative overflow-hidden w-full h-[280px] xs:h-[350px] sm:h-[440px] md:h-[500px]">
+                    <img 
+                        src="http://lemustech.net/imagenes/novabrands3.jpg" 
+                        id="hero-image" 
+                        alt="Novabrands Hero Hat Showcase" 
+                        class="w-full h-full object-cover object-center transition-transform duration-1000 scale-100 group-hover:scale-105 animate-[pulseScale_12s_ease-in-out_infinite_alternate]"
+                        onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1588850611197-4e6c1148b790?q=80&w=1200&auto=format&fit=crop'"
+                    >
+                    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-nova-blue/15 to-transparent -translate-x-full animate-[shimmerLight_6s_infinite] pointer-events-none mix-blend-screen"></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent flex items-end p-5 sm:p-8 pointer-events-none">
+                        <div class="text-left pointer-events-auto">
+                            <span class="text-[11px] font-semibold uppercase tracking-wider text-nova-blue bg-nova-blue/15 px-3 py-1 rounded-full border border-nova-blue/30 backdrop-blur-md inline-flex items-center gap-1.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-nova-blue animate-ping"></span>
+                                Edición Especial
+                            </span>
+                            <h2 class="text-xl sm:text-3xl font-extrabold text-white mt-2 tracking-tight">Colección Limitada Dark Stealth</h2>
+                            <p class="text-xs sm:text-sm text-zinc-300 max-w-md mt-1 leading-relaxed hidden xs:block">
+                                Diseñada con acabados oscuros mates, bordado 3D de alta densidad y tejido térmico estructurado.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </header>
 
-    <section id="experience-section" class="py-12 border-y border-white/5 bg-zinc-950/40">
-        <div class="container mx-auto px-4 sm:px-6 max-w-7xl">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                
-                <div class="flex items-start gap-4 p-4 rounded-xl bg-white/[0.02] border border-white/5">
-                    <div class="w-11 h-11 rounded-lg bg-nova-blue/10 text-nova-blue flex items-center justify-center shrink-0">
-                        <i class="fa-solid fa-crown text-lg"></i>
-                    </div>
-                    <div>
-                        <h4 class="text-white text-sm font-semibold">100% Originales</h4>
-                        <p class="text-xs text-zinc-400 mt-1">Garantía total de autenticidad en cada pieza y costura.</p>
-                    </div>
+    <main id="shop-section" class="py-10 sm:py-16 min-h-screen relative flex-grow">
+        <div class="container mx-auto px-4 max-w-7xl">
+            <div class="sticky top-16 z-30 bg-black/90 backdrop-blur-xl py-4 border-b border-zinc-900 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h3 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Catálogo Oficial</h3>
+                    <p class="text-zinc-500 text-xs mt-0.5 flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Sincronización en vivo con Firebase Firestore
+                    </p>
                 </div>
 
-                <div class="flex items-start gap-4 p-4 rounded-xl bg-white/[0.02] border border-white/5">
-                    <div class="w-11 h-11 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0">
-                        <i class="fa-solid fa-truck-fast text-lg"></i>
-                    </div>
-                    <div>
-                        <h4 class="text-white text-sm font-semibold">Envíos Seguros</h4>
-                        <p class="text-xs text-zinc-400 mt-1">Empacadas en cajas rígidas para que tu visera llegue intacta.</p>
-                    </div>
-                </div>
-
-                <div class="flex items-start gap-4 p-4 rounded-xl bg-white/[0.02] border border-white/5">
-                    <div class="w-11 h-11 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center shrink-0">
-                        <i class="fa-brands fa-whatsapp text-lg"></i>
-                    </div>
-                    <div>
-                        <h4 class="text-white text-sm font-semibold">Pedido por WhatsApp</h4>
-                        <p class="text-xs text-zinc-400 mt-1">Envía tu bolsa en 1 clic y coordina tu método de pago directo.</p>
-                    </div>
-                </div>
-
-                <div class="flex items-start gap-4 p-4 rounded-xl bg-white/[0.02] border border-white/5">
-                    <div class="w-11 h-11 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center shrink-0">
-                        <i class="fa-solid fa-shield-halved text-lg"></i>
-                    </div>
-                    <div>
-                        <h4 class="text-white text-sm font-semibold">Atención Personalizada</h4>
-                        <p class="text-xs text-zinc-400 mt-1">Te asesoramos con tallas y calces (Fitted, Snapback, Dad).</p>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </section>
-
-    <main id="shop-section" class="py-14 sm:py-20 min-h-screen relative">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-            
-            <!-- Filter & Search Toolbar (Sticky on Scroll) -->
-            <div class="sticky top-16 z-30 bg-black/90 backdrop-blur-xl py-4 -mx-4 px-4 sm:mx-0 sm:px-0 border-b border-zinc-800/80 mb-8 sm:mb-12">
-                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                    
-                    <div>
-                        <h3 class="heading-font text-2xl sm:text-3xl font-bold text-white tracking-tight">Catálogo Disponible</h3>
-                        <p class="text-xs sm:text-sm text-zinc-400" id="catalog-subtitle">Explora nuestras últimas referencias sincronizadas</p>
+                <div class="flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center w-full md:w-auto">
+                    <div class="relative flex-grow sm:w-64">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 text-xs"></i>
+                        <input 
+                            type="text" 
+                            id="search-input" 
+                            placeholder="Buscar gorra o categoría..." 
+                            oninput="handleSearch(this.value)"
+                            class="w-full bg-zinc-900/90 border border-zinc-800 text-xs text-white rounded-full pl-9 pr-4 py-2 focus:outline-none focus:border-nova-blue transition placeholder-zinc-500"
+                        >
                     </div>
 
-                    <!-- Search Bar & Sorter Controls -->
-                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                        
-                        <!-- Search Box -->
-                        <div class="relative min-w-[240px]">
-                            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 text-xs"></i>
-                            <input 
-                                type="text" 
-                                id="search-input" 
-                                oninput="handleSearch(this.value)" 
-                                placeholder="Buscar modelo, estilo..." 
-                                class="w-full bg-[#161618] border border-zinc-800 text-white rounded-full pl-9 pr-8 py-2 text-xs sm:text-sm focus:outline-none focus:border-nova-blue transition placeholder-zinc-500"
-                            >
-                            <button id="clear-search-btn" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white text-xs">
-                                <i class="fa-solid fa-xmark"></i>
-                            </button>
-                        </div>
-
-                        <!-- Sort Dropdown -->
-                        <div class="relative">
-                            <select id="sort-select" onchange="handleSort(this.value)" class="w-full sm:w-auto appearance-none bg-[#161618] border border-zinc-800 text-zinc-300 text-xs sm:text-sm rounded-full pl-4 pr-9 py-2 focus:outline-none focus:border-nova-blue cursor-pointer">
-                                <option value="featured">Destacados</option>
-                                <option value="price-asc">Precio: Menor a Mayor</option>
-                                <option value="price-desc">Precio: Mayor a Menor</option>
-                                <option value="name">Alfabético (A - Z)</option>
-                            </select>
-                            <i class="fa-solid fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-500 text-[10px] pointer-events-none"></i>
-                        </div>
-
+                    <div class="flex gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+                        <button onclick="setFilter('all')" class="filter-pill active px-4 py-1.5 rounded-full text-xs font-semibold bg-white text-black transition whitespace-nowrap">Todas</button>
+                        <button onclick="setFilter('Snapback')" class="filter-pill px-4 py-1.5 rounded-full text-xs font-semibold bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white transition whitespace-nowrap">Snapback</button>
+                        <button onclick="setFilter('Fitted')" class="filter-pill px-4 py-1.5 rounded-full text-xs font-semibold bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white transition whitespace-nowrap">Fitted</button>
+                        <button onclick="setFilter('Dad Hat')" class="filter-pill px-4 py-1.5 rounded-full text-xs font-semibold bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white transition whitespace-nowrap">Dad Hat</button>
+                        <button onclick="setFilter('Trucker')" class="filter-pill px-4 py-1.5 rounded-full text-xs font-semibold bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white transition whitespace-nowrap">Trucker</button>
                     </div>
-                </div>
-
-                <!-- Category Pills (Horizontal Scroll on Mobile) -->
-                <div class="flex gap-2 mt-4 overflow-x-auto pb-2 no-scrollbar scroll-smooth items-center">
-                    <button onclick="filterCategory('all')" class="filter-btn active px-4 py-1.5 rounded-full bg-white text-black text-xs font-semibold whitespace-nowrap transition shadow-sm">Todos</button>
-                    <button onclick="filterCategory('Snapback')" class="filter-btn px-4 py-1.5 rounded-full bg-[#18181A] text-zinc-400 hover:text-white hover:bg-[#242428] text-xs font-medium whitespace-nowrap border border-white/5 transition">Snapback</button>
-                    <button onclick="filterCategory('Fitted')" class="filter-btn px-4 py-1.5 rounded-full bg-[#18181A] text-zinc-400 hover:text-white hover:bg-[#242428] text-xs font-medium whitespace-nowrap border border-white/5 transition">Fitted</button>
-                    <button onclick="filterCategory('Dad Hat')" class="filter-btn px-4 py-1.5 rounded-full bg-[#18181A] text-zinc-400 hover:text-white hover:bg-[#242428] text-xs font-medium whitespace-nowrap border border-white/5 transition">Dad Hat</button>
-                    <button onclick="filterCategory('Trucker')" class="filter-btn px-4 py-1.5 rounded-full bg-[#18181A] text-zinc-400 hover:text-white hover:bg-[#242428] text-xs font-medium whitespace-nowrap border border-white/5 transition">Trucker</button>
                 </div>
             </div>
 
-            <!-- Loading State -->
-            <div id="loading-indicator" class="flex flex-col items-center justify-center py-28 gap-3">
-                <div class="loader"></div>
-                <span class="text-xs text-zinc-400 tracking-wide font-medium">Sincronizando inventario de gorras...</span>
+            <div id="loading-indicator" class="flex flex-col items-center justify-center py-24">
+                <div class="loader mb-3"></div>
+                <span class="text-xs text-zinc-500 tracking-wider font-medium uppercase">Cargando inventario oficial...</span>
             </div>
 
-            <!-- Product Grid -->
-            <div id="product-grid" class="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 hidden">
-                <!-- Products dynamically rendered by JavaScript -->
+            <div id="product-grid" class="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 pt-8 hidden">
+                <!-- Injected via JavaScript from Firestore -->
             </div>
 
-            <!-- Empty State Result -->
-            <div id="empty-state" class="hidden text-center py-24 px-4">
-                <div class="w-16 h-16 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-500 flex items-center justify-center mx-auto mb-4 text-2xl">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                </div>
-                <h4 class="text-white font-semibold text-lg">No encontramos resultados</h4>
-                <p class="text-zinc-400 text-xs sm:text-sm max-w-sm mx-auto mt-1 mb-6">No hay gorras disponibles que coincidan con tus filtros actuales.</p>
-                <button onclick="resetFilters()" class="btn-secondary px-6 py-2.5 text-xs font-medium inline-flex items-center gap-2">
-                    <i class="fa-solid fa-rotate-left"></i>
-                    <span>Restablecer Filtros</span>
-                </button>
+            <div id="empty-state" class="hidden text-center py-24">
+                <i class="fa-solid fa-hat-cowboy text-4xl text-zinc-600 mb-3"></i>
+                <h4 class="text-base font-semibold text-zinc-300">No se encontraron modelos</h4>
+                <p class="text-xs text-zinc-500 mt-1">Intenta con otro filtro de búsqueda o categoría.</p>
+                <button onclick="resetFilters()" class="mt-4 text-xs font-semibold text-nova-blue hover:underline">Restablecer filtros</button>
             </div>
-
         </div>
     </main>
 
-    <div id="quickview-modal" class="fixed inset-0 z-[90] hidden">
+    <div id="quick-view-modal" class="fixed inset-0 z-[90] hidden">
         <div class="absolute inset-0 bg-black/85 backdrop-blur-md" onclick="closeQuickView()"></div>
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[92%] sm:w-full max-w-2xl bg-oled-surface border border-white/10 rounded-2xl sm:rounded-3xl shadow-2xl p-5 sm:p-7 max-h-[92vh] overflow-y-auto">
-            
-            <button onclick="closeQuickView()" aria-label="Cerrar modal" class="absolute top-4 right-4 text-zinc-400 hover:text-white transition w-9 h-9 rounded-full bg-white/5 flex items-center justify-center">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-                <div class="aspect-square rounded-2xl overflow-hidden bg-black border border-white/5">
-                    <img id="qv-image" src="" alt="Vista Previa" class="w-full h-full object-cover">
-                </div>
-
-                <div class="flex flex-col justify-between">
-                    <div>
-                        <span id="qv-category" class="text-[11px] font-semibold text-nova-blue uppercase tracking-wider bg-nova-blue/10 px-2.5 py-1 rounded-md border border-nova-blue/20">Categoría</span>
-                        <h3 id="qv-title" class="heading-font text-2xl font-bold text-white mt-3">Nombre del Modelo</h3>
-                        <p id="qv-price" class="text-2xl font-extrabold text-nova-blue mt-2">$0.00 USD</p>
-                        
-                        <div class="mt-4 pt-4 border-t border-zinc-800 space-y-2 text-xs text-zinc-400">
-                            <div class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Corona alta estructurada con soporte frontal</div>
-                            <div class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Visera semi-curva moldeable de alta densidad</div>
-                            <div class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Broche o talla ajustable ergonómico</div>
-                        </div>
-                    </div>
-
-                    <div class="mt-6 flex flex-col gap-3">
-                        <button id="qv-add-btn" class="w-full btn-oled py-3.5 text-sm font-semibold flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-bag-shopping"></i>
-                            <span>Agregar a la Bolsa</span>
-                        </button>
-                        <button onclick="orderViaWhatsAppDirect()" class="w-full bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 py-3 rounded-full text-xs font-semibold flex items-center justify-center gap-2 transition">
-                            <i class="fa-brands fa-whatsapp text-sm"></i>
-                            <span>Pedir Directo por WhatsApp</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <div id="auth-modal" class="fixed inset-0 z-[95] hidden">
-        <div class="absolute inset-0 bg-black/85 backdrop-blur-md" onclick="closeAuthModal()"></div>
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#121214] w-[92%] sm:w-full max-w-md rounded-2xl shadow-2xl p-6 sm:p-8 border border-white/10">
-            
-            <div class="flex justify-between items-center mb-6">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-nova-blue/10 text-nova-blue flex items-center justify-center">
-                        <i class="fa-solid fa-shield-halved text-lg"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-lg font-bold text-white">Acceso Administrativo</h2>
-                        <p class="text-xs text-zinc-400">Exclusivo para UID autorizado</p>
-                    </div>
-                </div>
-                <button onclick="closeAuthModal()" class="text-zinc-400 hover:text-white transition w-8 h-8 rounded-full bg-white/5 flex items-center justify-center">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg p-4 sm:p-6 bg-zinc-950 border border-zinc-800 rounded-2xl shadow-2xl z-10 mx-auto max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center pb-3 border-b border-zinc-800">
+                <span class="text-xs uppercase font-bold tracking-wider text-nova-blue" id="qv-category">Gorra</span>
+                <button onclick="closeQuickView()" class="w-8 h-8 rounded-full bg-zinc-900 flex items-center justify-center text-zinc-400 hover:text-white transition">
                     <i class="fa-solid fa-xmark text-sm"></i>
                 </button>
             </div>
+            
+            <div class="mt-4 rounded-xl overflow-hidden bg-black aspect-square border border-zinc-900">
+                <img id="qv-image" src="" alt="Gorra Novabrands" class="w-full h-full object-cover">
+            </div>
 
-            <form id="auth-login-form" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-medium text-zinc-400 mb-1.5">Correo electrónico</label>
-                    <input type="email" id="auth-email" required autocomplete="username" placeholder="admin@novabrands.com" class="w-full bg-[#1A1A1D] border border-white/10 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-nova-blue transition placeholder-zinc-600 text-sm">
+            <div class="mt-4">
+                <div class="flex justify-between items-center">
+                    <h3 id="qv-title" class="text-lg font-bold text-white">Modelo</h3>
+                    <span id="qv-price" class="text-lg font-extrabold text-nova-blue">$0.00</span>
                 </div>
+                <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
+                    Estructura premium con acabados de alta resistencia, visera curvable o plana de ajuste exacto, y bordado de alta precisión.
+                </p>
+            </div>
+
+            <div class="mt-6 flex gap-3">
+                <button id="qv-add-btn" class="flex-1 bg-white hover:bg-zinc-200 text-black font-semibold text-xs py-3 rounded-xl transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-bag-shopping"></i> Agregar a la bolsa
+                </button>
+                <button id="qv-wa-btn" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs py-3 rounded-xl transition flex items-center justify-center gap-2">
+                    <i class="fa-brands fa-whatsapp"></i> Pedir al WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="auth-modal" class="fixed inset-0 z-[100] hidden">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-md" onclick="closeAuthModal()"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm p-6 bg-zinc-950 border border-zinc-800 rounded-3xl shadow-2xl z-10 mx-auto">
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                    <i class="fa-solid fa-lock text-nova-blue text-lg"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white">Acceso Administrativo</h3>
+                <p class="text-xs text-zinc-400 mt-1">Ingresa las credenciales del UID autorizado</p>
+                <div class="mt-2 text-[10px] text-zinc-500 font-mono bg-zinc-900/60 py-1 px-2 rounded-lg inline-block border border-white/5">
+                    UID: ZUaPEzFf2ZN3m49qyIKKZtxZN302
+                </div>
+            </div>
+
+            <form id="admin-login-form" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-medium text-zinc-400 mb-1.5">Contraseña</label>
+                    <label class="block text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-1">Correo Electrónico</label>
+                    <input 
+                        type="email" 
+                        id="admin-email" 
+                        required 
+                        placeholder="admin@novabrands.com" 
+                        class="w-full bg-zinc-900 border border-zinc-800 text-white text-xs rounded-xl px-3.5 py-3 focus:outline-none focus:border-nova-blue transition"
+                    >
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-1">Contraseña</label>
                     <div class="relative">
-                        <input type="password" id="auth-password" required autocomplete="current-password" placeholder="••••••••" class="w-full bg-[#1A1A1D] border border-white/10 text-white rounded-xl px-4 py-3 pr-10 focus:outline-none focus:border-nova-blue transition placeholder-zinc-600 text-sm">
-                        <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white transition p-1 text-xs">
-                            <i class="fa-solid fa-eye" id="toggle-pwd-icon"></i>
+                        <input 
+                            type="password" 
+                            id="admin-password" 
+                            required 
+                            placeholder="••••••••" 
+                            class="w-full bg-zinc-900 border border-zinc-800 text-white text-xs rounded-xl px-3.5 py-3 pr-10 focus:outline-none focus:border-nova-blue transition"
+                        >
+                        <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white transition text-xs p-1">
+                            <i id="pwd-toggle-icon" class="fa-regular fa-eye"></i>
                         </button>
                     </div>
                 </div>
-                
-                <div id="auth-error" class="hidden text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-3 leading-relaxed">
-                    Credenciales incorrectas o usuario sin privilegios.
-                </div>
 
-                <button type="submit" id="btn-login-submit" class="w-full btn-oled py-3.5 font-semibold text-sm flex justify-center items-center gap-2 mt-2">
-                    <span>Iniciar Sesión</span>
-                </button>
+                <div id="auth-error-msg" class="text-red-400 text-xs bg-red-500/10 border border-red-500/20 p-2.5 rounded-xl hidden text-center leading-tight"></div>
+
+                <div class="flex gap-2 pt-2">
+                    <button type="button" onclick="closeAuthModal()" class="w-1/3 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-semibold py-3 rounded-xl transition">
+                        Cancelar
+                    </button>
+                    <button type="submit" id="btn-admin-login" class="w-2/3 bg-white hover:bg-zinc-200 text-black text-xs font-bold py-3 rounded-xl transition flex justify-center items-center">
+                        Ingresar
+                    </button>
+                </div>
             </form>
-            
-            <div class="mt-6 pt-4 border-t border-zinc-800 text-center">
-                <p class="text-[11px] text-zinc-500 font-mono">UID Seguro: <span class="text-zinc-300 font-semibold">ZUaPE...302</span></p>
-            </div>
         </div>
     </div>
 
     <div id="admin-modal" class="fixed inset-0 z-[100] hidden">
         <div class="absolute inset-0 bg-black/85 backdrop-blur-md" onclick="handleAdminExit()"></div>
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#121214] w-[95%] sm:w-full max-w-2xl rounded-2xl shadow-2xl p-5 sm:p-8 border border-white/10 max-h-[92vh] overflow-y-auto">
-            
-            <div class="flex justify-between items-center mb-6 pb-4 border-b border-zinc-800">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-zinc-950 w-[95%] max-w-2xl max-h-[92vh] rounded-3xl shadow-2xl p-5 sm:p-7 z-10 overflow-y-auto border border-zinc-800">
+            <div class="flex justify-between items-center pb-4 mb-5 border-b border-zinc-800">
                 <div class="flex items-center gap-3">
-                    <img src="http://lemustech.net/imagenes/novabrands1.jpeg" alt="Novabrands" class="clean-logo h-8 w-auto">
+                    <div class="w-8 h-8 rounded-lg bg-nova-blue/15 border border-nova-blue/30 flex items-center justify-center">
+                        <i class="fa-solid fa-shield-halved text-nova-blue text-sm"></i>
+                    </div>
                     <div>
-                        <h2 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
-                            Gestión de Catálogo
-                            <span class="text-[9px] uppercase font-bold tracking-wider bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/30">Admin Activo</span>
-                        </h2>
-                        <span id="admin-user-tag" class="text-[10px] text-zinc-400 font-mono block">UID: ZUaPE...302</span>
+                        <h2 class="text-lg font-bold text-white leading-tight">Panel Administrativo</h2>
+                        <span class="text-[10px] text-emerald-400 font-medium">Sesión verificada por UID</span>
                     </div>
                 </div>
-                
-                <div class="flex items-center gap-2">
-                    <button onclick="handleAdminExit()" class="text-xs text-red-400 hover:text-red-300 transition px-3.5 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 flex items-center gap-1.5 font-medium border border-red-500/20" title="Cerrar Sesión y Salir">
-                        <i class="fa-solid fa-right-from-bracket"></i>
-                        <span>Cerrar Sesión y Salir</span>
-                    </button>
-                </div>
+                <button onclick="handleAdminExit()" class="text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-lg transition font-medium flex items-center gap-1.5" title="Cerrar Sesión Obligatorio para salir">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    <span>Cerrar Sesión</span>
+                </button>
             </div>
-            
-            <!-- Product Creation Form -->
-            <form id="add-product-form" class="space-y-4 mb-8 bg-black/50 p-4 sm:p-5 rounded-2xl border border-white/5">
+
+            <form id="add-product-form" class="space-y-4 mb-6 bg-zinc-900/60 p-4 sm:p-5 rounded-2xl border border-zinc-800">
                 <h3 class="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2 flex items-center gap-2">
-                    <i class="fa-solid fa-circle-plus text-nova-blue"></i>
-                    <span>Cargar Nueva Gorra</span>
+                    <i class="fa-solid fa-plus text-nova-blue"></i>
+                    Cargar Nueva Gorra al Catálogo
                 </h3>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-[11px] text-zinc-400 mb-1">Nombre del Modelo</label>
-                        <input type="text" id="prod-name" required placeholder="Ej. New York Blackout" class="w-full bg-[#1C1C1F] border border-white/10 text-white rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-nova-blue transition placeholder-zinc-600 text-xs sm:text-sm">
+                        <label class="block text-[11px] font-medium text-zinc-400 mb-1">Nombre del Modelo</label>
+                        <input type="text" id="prod-name" required placeholder="Ej: Nova All-Black Snapback" class="w-full bg-zinc-900 border border-zinc-800 text-white rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:border-nova-blue transition">
                     </div>
                     <div>
-                        <label class="block text-[11px] text-zinc-400 mb-1">Precio ($ USD)</label>
-                        <input type="number" step="0.01" id="prod-price" required placeholder="45.00" class="w-full bg-[#1C1C1F] border border-white/10 text-white rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-nova-blue transition placeholder-zinc-600 text-xs sm:text-sm">
+                        <label class="block text-[11px] font-medium text-zinc-400 mb-1">Precio ($ USD)</label>
+                        <input type="number" step="0.01" id="prod-price" required placeholder="35.00" class="w-full bg-zinc-900 border border-zinc-800 text-white rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:border-nova-blue transition">
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-[11px] text-zinc-400 mb-1">Tipo de Gorra</label>
-                        <select id="prod-category" class="w-full bg-[#1C1C1F] border border-white/10 text-white rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-nova-blue transition text-xs sm:text-sm cursor-pointer">
-                            <option value="Snapback">Snapback (Ajustable)</option>
-                            <option value="Fitted">Fitted (Cerrada)</option>
-                            <option value="Dad Hat">Dad Hat (Curva clásica)</option>
-                            <option value="Trucker">Trucker (Malla)</option>
+                        <label class="block text-[11px] font-medium text-zinc-400 mb-1">Categoría</label>
+                        <select id="prod-category" class="w-full bg-zinc-900 border border-zinc-800 text-white rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:border-nova-blue transition">
+                            <option value="Snapback">Snapback</option>
+                            <option value="Fitted">Fitted</option>
+                            <option value="Dad Hat">Dad Hat</option>
+                            <option value="Trucker">Trucker</option>
                         </select>
                     </div>
 
-                    <!-- Input Method Toggle (Mobile Camera / Web URL) -->
                     <div>
-                        <label class="block text-[11px] text-zinc-400 mb-1">Origen de la Foto</label>
-                        <div class="flex items-center gap-1.5 bg-[#1C1C1F] p-1 rounded-xl border border-white/10 text-xs">
-                            <button type="button" id="tab-file-btn" onclick="setImageInputMode('file')" class="flex-1 py-1.5 px-2 rounded-lg bg-nova-blue text-white font-medium transition flex items-center justify-center gap-1.5 shadow-sm">
-                                <i class="fa-solid fa-camera"></i>
-                                <span>Galería / Cámara</span>
+                        <label class="block text-[11px] font-medium text-zinc-400 mb-1">Origen de la Foto</label>
+                        <div class="flex gap-2">
+                            <button type="button" onclick="setImageMode('file')" id="mode-file-btn" class="flex-1 py-2 px-2.5 text-xs font-semibold rounded-xl bg-nova-blue text-white transition flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-camera"></i> Galería / Cámara
                             </button>
-                            <button type="button" id="tab-url-btn" onclick="setImageInputMode('url')" class="flex-1 py-1.5 px-2 rounded-lg text-zinc-400 hover:text-white font-medium transition flex items-center justify-center gap-1.5">
-                                <i class="fa-solid fa-link"></i>
-                                <span>URL Web</span>
+                            <button type="button" onclick="setImageMode('url')" id="mode-url-btn" class="flex-1 py-2 px-2.5 text-xs font-medium rounded-xl bg-zinc-800 text-zinc-400 hover:text-white transition flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-link"></i> URL Web
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Mode 1: Phone Photo Uploader with Auto-compression -->
-                <div id="file-upload-container" class="space-y-3">
-                    <label for="prod-file" class="group relative flex flex-col items-center justify-center border-2 border-dashed border-white/15 hover:border-nova-blue/60 rounded-2xl p-5 cursor-pointer bg-white/[0.02] hover:bg-white/[0.04] transition">
-                        <div class="flex flex-col items-center justify-center text-center">
-                            <div class="w-12 h-12 mb-2 rounded-full bg-nova-blue/10 text-nova-blue flex items-center justify-center group-hover:scale-110 transition-transform">
-                                <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
+                <div id="file-upload-section">
+                    <label class="block text-[11px] font-medium text-zinc-400 mb-1">Seleccionar o tomar foto</label>
+                    <div class="border border-dashed border-zinc-700 hover:border-nova-blue rounded-xl p-4 text-center cursor-pointer transition bg-zinc-900/40" onclick="document.getElementById('phone-camera-input').click()">
+                        <input type="file" id="phone-camera-input" accept="image/*" class="hidden" onchange="handlePhoneImageSelection(this)">
+                        <div id="upload-placeholder" class="flex flex-col items-center">
+                            <i class="fa-solid fa-cloud-arrow-up text-xl text-zinc-400 mb-1.5"></i>
+                            <span class="text-xs font-semibold text-zinc-300">Toca para abrir cámara o fotos</span>
+                            <span class="text-[10px] text-zinc-500 mt-0.5">Optimización y compresión automática en tu teléfono</span>
+                        </div>
+                        <div id="upload-preview-container" class="hidden flex items-center justify-center gap-3">
+                            <img id="upload-preview-img" src="" class="w-14 h-14 rounded-lg object-cover border border-zinc-700">
+                            <div class="text-left">
+                                <span class="text-xs font-semibold text-emerald-400 block"><i class="fa-solid fa-check"></i> Foto lista</span>
+                                <span id="upload-preview-size" class="text-[10px] text-zinc-400 block">0 KB</span>
+                                <button type="button" onclick="event.stopPropagation(); clearSelectedImage()" class="text-[10px] text-red-400 hover:underline mt-0.5">Cambiar foto</button>
                             </div>
-                            <span class="text-xs sm:text-sm font-medium text-white mb-0.5">Toca para tomar foto o elegir de tu galería</span>
-                            <span class="text-[10px] text-zinc-500">Se optimiza automáticamente para pantallas móviles</span>
                         </div>
-                        <input type="file" id="prod-file" accept="image/*" class="hidden" onchange="handleImageSelection(event)">
-                    </label>
-
-                    <!-- Preview of loaded mobile photo -->
-                    <div id="image-preview-wrapper" class="hidden items-center gap-4 bg-[#1C1C1F] p-3 rounded-xl border border-white/10">
-                        <img id="image-preview" src="" alt="Preview" class="w-14 h-14 rounded-lg object-cover bg-black border border-white/10">
-                        <div class="flex-grow min-w-0">
-                            <span id="preview-filename" class="text-xs text-white font-medium block truncate">foto_gorra.jpg</span>
-                            <span id="preview-filesize" class="text-[11px] text-emerald-400 font-mono">Optimizada y lista</span>
-                        </div>
-                        <button type="button" onclick="clearSelectedImage()" class="text-zinc-400 hover:text-red-400 transition p-2" title="Quitar foto">
-                            <i class="fa-solid fa-trash-can text-sm"></i>
-                        </button>
                     </div>
                 </div>
 
-                <!-- Mode 2: URL Input -->
-                <div id="url-upload-container" class="hidden">
-                    <label class="block text-[11px] text-zinc-400 mb-1">Enlace de la imagen (HTTPS)</label>
-                    <input type="url" id="prod-img" placeholder="https://ejemplo.com/gorra.jpg" class="w-full bg-[#1C1C1F] border border-white/10 text-white rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-nova-blue transition placeholder-zinc-600 text-xs sm:text-sm">
+                <div id="url-upload-section" class="hidden">
+                    <label class="block text-[11px] font-medium text-zinc-400 mb-1">URL de la Imagen</label>
+                    <input type="url" id="prod-img" placeholder="https://..." class="w-full bg-zinc-900 border border-zinc-800 text-white rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:border-nova-blue transition">
                 </div>
 
-                <button type="submit" id="btn-add-product" class="w-full bg-white text-black font-bold py-3 rounded-xl hover:bg-zinc-200 transition mt-2 flex justify-center items-center gap-2 text-xs sm:text-sm shadow-md active:scale-[0.99]">
-                    <i class="fa-solid fa-floppy-disk"></i>
-                    <span>Guardar y Publicar en Catálogo</span>
+                <button type="submit" id="btn-add-product" class="w-full bg-white hover:bg-zinc-200 text-black font-bold py-3 rounded-xl transition text-xs flex justify-center items-center gap-2">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <span>Publicar Gorra en Tiempo Real</span>
                 </button>
             </form>
 
-            <!-- Admin Inventory List -->
             <div>
-                <div class="flex justify-between items-center mb-3">
-                    <h3 class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Inventario en Vivo (<span id="admin-inventory-count">0</span>)</h3>
-                    <span class="text-[10px] text-zinc-500">Elimina o inspecciona modelos</span>
-                </div>
-                <div class="max-h-64 overflow-y-auto space-y-2 pr-1" id="admin-list">
-                    <div class="text-center text-zinc-500 text-xs py-6">Cargando inventario...</div>
+                <h3 class="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-3">Modelos en Inventario Directo</h3>
+                <div class="max-h-60 overflow-y-auto space-y-2 pr-1" id="admin-list">
+                    <div class="text-center text-zinc-500 text-xs py-4">Cargando datos...</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="confirm-modal" class="fixed inset-0 z-[120] hidden items-center justify-center p-4">
-        <div class="absolute inset-0 bg-black/85 backdrop-blur-sm" onclick="closeConfirmModal()"></div>
-        <div class="relative bg-[#141416] border border-white/10 rounded-2xl max-w-sm w-full p-6 text-center shadow-2xl z-10">
-            <div class="w-12 h-12 rounded-full bg-red-500/10 text-red-500 flex items-center justify-center mx-auto mb-4 text-xl">
-                <i class="fa-solid fa-trash-can"></i>
+    <div id="cart-overlay" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[60] hidden transition-opacity duration-300 opacity-0" onclick="toggleCart()"></div>
+    <aside id="cart-sidebar" class="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-zinc-950 z-[70] transform translate-x-full transition-transform duration-300 flex flex-col border-l border-zinc-900 shadow-2xl">
+        <div class="p-5 flex justify-between items-center border-b border-zinc-900">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-bag-shopping text-nova-blue text-base"></i>
+                <h2 class="text-base font-bold text-white">Tu Bolsa de Compras</h2>
             </div>
-            <h3 class="text-base font-bold text-white mb-2" id="confirm-modal-title">¿Eliminar producto?</h3>
-            <p class="text-zinc-400 text-xs mb-6" id="confirm-modal-desc">Esta acción removerá la gorra permanentemente del catálogo en vivo.</p>
-            <div class="flex gap-3">
-                <button onclick="closeConfirmModal()" class="w-1/2 py-2.5 rounded-xl bg-white/10 text-white hover:bg-white/15 transition text-xs font-semibold">Cancelar</button>
-                <button id="confirm-action-btn" class="w-1/2 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white transition text-xs font-semibold">Eliminar</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="cart-overlay" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-[70] hidden transition-opacity duration-300 opacity-0" onclick="toggleCart()"></div>
-    
-    <aside id="cart-sidebar" class="fixed top-0 right-0 h-full w-full sm:w-[420px] bg-[#121214] z-[80] transform translate-x-full transition-transform duration-500 cubic-bezier(0.16, 1, 0.3, 1) shadow-[-10px_0_50px_rgba(0,0,0,0.8)] flex flex-col border-l border-white/5">
-        
-        <!-- Cart Header -->
-        <div class="p-5 sm:p-6 flex justify-between items-center border-b border-zinc-800">
-            <div class="flex items-center gap-2.5">
-                <i class="fa-solid fa-bag-shopping text-nova-blue text-lg"></i>
-                <h2 class="heading-font text-lg sm:text-xl font-bold text-white">Tu Bolsa de Compra</h2>
-            </div>
-            <button onclick="toggleCart()" aria-label="Cerrar bolsa" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 text-white transition">
+            <button onclick="toggleCart()" class="w-8 h-8 rounded-full bg-zinc-900 flex items-center justify-center hover:bg-zinc-800 text-zinc-400 hover:text-white transition">
                 <i class="fa-solid fa-xmark text-sm"></i>
             </button>
         </div>
         
-        <!-- Cart Body -->
-        <div id="cart-items" class="flex-grow overflow-y-auto p-4 sm:p-6 space-y-3">
-            <!-- Injected via JavaScript -->
-        </div>
+        <div id="cart-items" class="flex-grow overflow-y-auto p-4 space-y-3"></div>
 
-        <!-- Cart Footer Checkout -->
-        <div class="p-5 sm:p-6 bg-black/60 border-t border-zinc-800">
-            <div class="space-y-2 mb-4">
-                <div class="flex justify-between items-center text-xs text-zinc-400">
-                    <span>Subtotal</span>
-                    <span id="cart-subtotal" class="font-mono text-zinc-200">$0.00</span>
-                </div>
-                <div class="flex justify-between items-center text-xs text-zinc-400">
-                    <span>Envío</span>
-                    <span class="text-emerald-400">Calculado por WhatsApp</span>
-                </div>
-                <div class="flex justify-between items-center pt-2 border-t border-zinc-800">
-                    <span class="text-sm font-semibold text-white">Total Estimado</span>
-                    <span id="cart-total" class="text-xl font-extrabold text-white font-mono">$0.00</span>
-                </div>
+        <div class="p-5 bg-zinc-900/40 border-t border-zinc-900">
+            <div class="flex justify-between items-center mb-4">
+                <span class="text-xs uppercase font-semibold text-zinc-400 tracking-wider">Total a Pagar</span>
+                <span id="cart-total" class="text-xl font-extrabold text-white">$0.00</span>
             </div>
-
-            <!-- Checkout Buttons -->
-            <div class="flex flex-col gap-2.5">
-                <button onclick="checkoutWhatsApp()" class="w-full bg-[#25D366] hover:bg-[#20BD5A] text-black font-bold py-3.5 px-4 rounded-full text-sm flex items-center justify-center gap-2.5 transition shadow-lg active:scale-[0.98]">
-                    <i class="fa-brands fa-whatsapp text-lg"></i>
-                    <span>Completar Pedido por WhatsApp</span>
-                </button>
-                <button onclick="checkoutDemo()" class="w-full btn-secondary py-3 text-xs font-medium text-zinc-300">
-                    Finalizar en Efectivo / Transferencia
-                </button>
-            </div>
+            <button onclick="checkoutWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 px-4 rounded-xl text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(16,185,129,0.3)]">
+                <i class="fa-brands fa-whatsapp text-base"></i>
+                <span>Completar Pedido por WhatsApp</span>
+            </button>
         </div>
     </aside>
 
-    <section id="faq-section" class="py-16 sm:py-24 border-t border-white/5 bg-zinc-950/60">
-        <div class="container mx-auto px-4 sm:px-6 max-w-4xl">
-            <div class="text-center mb-12">
-                <span class="text-xs uppercase tracking-widest text-nova-blue font-bold">Información Práctica</span>
-                <h3 class="heading-font text-3xl sm:text-4xl font-bold text-white mt-1">Preguntas Frecuentes</h3>
-            </div>
-
-            <div class="space-y-4">
-                <details class="group bg-[#121214] border border-white/5 rounded-2xl p-5 cursor-pointer">
-                    <summary class="flex justify-between items-center font-semibold text-sm sm:text-base text-white list-none">
-                        <span>¿Cómo garantizan que la gorra no se deforme en el envío?</span>
-                        <i class="fa-solid fa-chevron-down text-xs text-zinc-500 transition-transform group-open:rotate-180"></i>
-                    </summary>
-                    <p class="text-xs sm:text-sm text-zinc-400 mt-3 leading-relaxed">
-                        Todas nuestras gorras se despachan en cajas rígidas acartonadas de grado premium con soporte para la corona y burbujas de aire protectoras. Llegan 100% intactas a cualquier destino.
-                    </p>
-                </details>
-
-                <details class="group bg-[#121214] border border-white/5 rounded-2xl p-5 cursor-pointer">
-                    <summary class="flex justify-between items-center font-semibold text-sm sm:text-base text-white list-none">
-                        <span>¿Cuáles son los métodos de pago disponibles?</span>
-                        <i class="fa-solid fa-chevron-down text-xs text-zinc-500 transition-transform group-open:rotate-180"></i>
-                    </summary>
-                    <p class="text-xs sm:text-sm text-zinc-400 mt-3 leading-relaxed">
-                        Aceptamos transferencias bancarias, Zelle, Pago Móvil, Binance Pay (USDT) y efectivo según tu ubicación. Al pulsar "Completar Pedido por WhatsApp", un asesor te facilitará las cuentas de inmediato.
-                    </p>
-                </details>
-
-                <details class="group bg-[#121214] border border-white/5 rounded-2xl p-5 cursor-pointer">
-                    <summary class="flex justify-between items-center font-semibold text-sm sm:text-base text-white list-none">
-                        <span>¿Cómo elijo la talla si la gorra es Fitted (cerrada)?</span>
-                        <i class="fa-solid fa-chevron-down text-xs text-zinc-500 transition-transform group-open:rotate-180"></i>
-                    </summary>
-                    <p class="text-xs sm:text-sm text-zinc-400 mt-3 leading-relaxed">
-                        Las gorras Fitted vienen en medidas exactas (desde 7 hasta 8). Si tienes dudas con los centímetros de tu cabeza, puedes consultarnos por WhatsApp antes de ordenar y te guiaremos con la tabla de tallas oficial.
-                    </p>
-                </details>
-            </div>
-        </div>
-    </section>
-
-    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#1C1C1F] border border-white/15 text-white px-5 py-3 rounded-full shadow-[0_12px_40px_rgba(0,0,0,0.8)] font-medium text-xs sm:text-sm translate-y-20 opacity-0 transition-all duration-300 z-[110] flex items-center gap-3 backdrop-blur-2xl pointer-events-none max-w-[90vw] truncate">
-        <i class="fa-solid fa-circle-check text-nova-blue shrink-0"></i>
-        <span id="toast-msg" class="truncate">Notificación</span>
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-zinc-900 border border-zinc-800 text-white px-5 py-2.5 rounded-full shadow-[0_10px_30px_rgba(0,0,0,0.8)] font-medium text-xs translate-y-20 opacity-0 transition-all duration-300 z-[120] flex items-center gap-2 pointer-events-none">
+        <i class="fa-solid fa-circle-check text-nova-blue"></i>
+        <span id="toast-msg">Mensaje del sistema</span>
     </div>
 
-    <footer class="bg-black py-12 border-t border-white/5 text-xs text-zinc-500 mt-auto">
-        <div class="container mx-auto px-4 max-w-5xl text-center">
-            
-            <div class="flex justify-center mb-5">
-                <button onclick="handleAdminClick()" class="focus:outline-none group relative p-1 transition-transform active:scale-95" title="Acceso Administrativo Novabrands">
-                    <img src="http://lemustech.net/imagenes/novabrands1.jpeg" alt="Novabrands Emblem Footer" class="clean-logo h-10 w-auto opacity-75 group-hover:opacity-100 transition-opacity">
-                    <span id="footer-admin-dot" class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-transparent transition-all"></span>
-                </button>
+    <footer class="bg-black py-12 border-t border-zinc-900 text-xs text-zinc-500 mt-auto">
+        <div class="container mx-auto px-4 max-w-5xl text-center flex flex-col items-center">
+            <div class="relative inline-block mb-4 cursor-pointer group" onclick="toggleAdminTrigger()" title="Panel de Administración">
+                <img 
+                    src="http://lemustech.net/imagenes/novabrands1.jpeg" 
+                    alt="Novabrands Emblem" 
+                    class="h-8 w-auto object-contain clean-logo opacity-60 group-hover:opacity-100 transition duration-300"
+                    onerror="this.onerror=null; this.src='https://placehold.co/100x30/000000/ffffff?text=NOVABRANDS'"
+                >
+                <span id="footer-admin-indicator" class="hidden absolute -bottom-2 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
             </div>
-
-            <p class="font-medium text-zinc-400 mb-2">Novabrands Headwear Culture & Co.</p>
-            <p class="text-[11px] text-zinc-600">Ediciones Limitadas • Materiales Seleccionados • Envíos Garantizados</p>
-            <p class="text-[10px] text-zinc-700 mt-4">© 2026 Novabrands Inc. Todos los derechos reservados.</p>
-            <p class="text-[11px] text-zinc-500 mt-3 flex items-center justify-center gap-1.5">
-                <span>Desarrollado por</span>
-                <a href="https://instagram.com/lemustech.ve" target="_blank" rel="noopener noreferrer" class="text-nova-blue hover:text-white transition font-medium">@Lemustech.ve</a>
+            <p class="text-zinc-500 text-xs">Copyright © 2026 Novabrands Inc. Todos los derechos reservados.</p>
+            <p class="mt-2 text-zinc-400 text-xs font-medium">
+                Desarrollado por <a href="https://instagram.com/lemustech.ve" target="_blank" rel="noopener noreferrer" class="text-white hover:text-nova-blue transition underline underline-offset-2">@Lemustech.ve</a>
             </p>
         </div>
     </footer>
 
     <script>
+        const TARGET_ADMIN_UID = "ZUaPEzFf2ZN3m49qyIKKZtxZN302";
+        const STORE_PHONE = "584120000000";
+
         let products = [];
         let cart = JSON.parse(localStorage.getItem('novabrands_cart')) || [];
         let currentFilter = 'all';
         let searchQuery = '';
-        let currentSort = 'featured';
-        let pendingDeleteId = null;
         let currentUser = null;
         let currentImageMode = 'file';
         let processedImageDataUrl = null;
         let selectedProductForQv = null;
 
-        const TARGET_ADMIN_UID = "ZUaPEzFf2ZN3m49qyIKKZtxZN302";
-        const STORE_PHONE = "584120000000";
-
-        const sampleProducts = [
-            {
-                id: "sample-1",
-                name: "Nova Stealth Blackout Snapback",
-                category: "Snapback",
-                price: 45.00,
-                image: "https://images.unsplash.com/photo-1588850611197-4e6c1148b790?q=80&w=800&auto=format&fit=crop"
-            },
-            {
-                id: "sample-2",
-                name: "Onyx Structured Fitted 59Fifty",
-                category: "Fitted",
-                price: 48.00,
-                image: "https://images.unsplash.com/photo-1575428652377-a2d80e2277fc?q=80&w=800&auto=format&fit=crop"
-            },
-            {
-                id: "sample-3",
-                name: "Midnight Classic Dad Hat",
-                category: "Dad Hat",
-                price: 38.00,
-                image: "https://images.unsplash.com/photo-1521369909029-2afed882baee?q=80&w=800&auto=format&fit=crop"
-            },
-            {
-                id: "sample-4",
-                name: "Shadow Edition Mesh Trucker",
-                category: "Trucker",
-                price: 42.00,
-                image: "https://images.unsplash.com/photo-1534215754734-18e55d13e346?q=80&w=800&auto=format&fit=crop"
-            }
-        ];
-
-        document.addEventListener('DOMContentLoaded', () => {
-            renderCart();
-            window.addEventListener('firebase-ready', initFirebase);
-
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            const msgEl = document.getElementById('toast-msg');
+            if (!toast || !msgEl) return;
+            msgEl.innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
             setTimeout(() => {
-                if (products.length === 0) {
-                    products = [...sampleProducts];
-                    hideLoaderAndRender();
-                }
-            }, 1200);
-
-            setupAuthListeners();
-        });
-
-        async function initFirebase() {
-            if (!window.firebaseDB) return;
-            const { productsCollection, onSnapshot, query, auth, onAuthStateChanged } = window.firebaseDB;
-            
-            onAuthStateChanged(auth, (user) => {
-                if (user && user.uid === TARGET_ADMIN_UID) {
-                    currentUser = user;
-                    updateAdminBadge(user);
-                } else if (user) {
-                    if (window.firebaseDB && window.firebaseDB.signOut) {
-                        window.firebaseDB.signOut(auth);
-                    }
-                    currentUser = null;
-                    updateAdminBadge(null);
-                    closeAdminPanel();
-                } else {
-                    currentUser = null;
-                    updateAdminBadge(null);
-                    closeAdminPanel();
-                }
-            });
-
-            try {
-                const q = query(productsCollection);
-
-                onSnapshot(q, (snapshot) => {
-                    const loaded = snapshot.docs.map(doc => ({
-                        id: doc.id,
-                        ...doc.data()
-                    }));
-                    
-                    if (loaded.length > 0) {
-                        products = loaded;
-                    } else if (products.length === 0) {
-                        products = [...sampleProducts];
-                    }
-                    
-                    hideLoaderAndRender();
-                }, (error) => {
-                    console.warn("Firestore listener warning:", error);
-                    if (products.length === 0) {
-                        products = [...sampleProducts];
-                        hideLoaderAndRender();
-                    }
-                });
-
-            } catch (e) {
-                console.error("Firebase Init Error:", e);
-                if (products.length === 0) {
-                    products = [...sampleProducts];
-                    hideLoaderAndRender();
-                }
-            }
-        }
-
-        function hideLoaderAndRender() {
-            const indicator = document.getElementById('loading-indicator');
-            const grid = document.getElementById('product-grid');
-            if (indicator) indicator.classList.add('hidden');
-            if (grid) grid.classList.remove('hidden');
-            applyFiltersAndRender();
-            renderAdminList();
-        }
-
-        function applyFiltersAndRender() {
-            const grid = document.getElementById('product-grid');
-            const emptyState = document.getElementById('empty-state');
-            if (!grid) return;
-
-            let filtered = products.filter(p => {
-                const matchesCategory = currentFilter === 'all' || p.category.toLowerCase() === currentFilter.toLowerCase();
-                const matchesSearch = !searchQuery || 
-                    p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                    p.category.toLowerCase().includes(searchQuery.toLowerCase());
-                return matchesCategory && matchesSearch;
-            });
-
-            if (currentSort === 'price-asc') {
-                filtered.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
-            } else if (currentSort === 'price-desc') {
-                filtered.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
-            } else if (currentSort === 'name') {
-                filtered.sort((a, b) => a.name.localeCompare(b.name));
-            }
-
-            if (filtered.length === 0) {
-                grid.innerHTML = '';
-                grid.classList.add('hidden');
-                emptyState.classList.remove('hidden');
-                return;
-            }
-
-            emptyState.classList.add('hidden');
-            grid.classList.remove('hidden');
-            grid.innerHTML = '';
-
-            filtered.forEach((product, index) => {
-                const card = document.createElement('div');
-                card.className = `product-card flex flex-col h-full fade-in`;
-                card.style.animationDelay = `${Math.min(index * 0.04, 0.3)}s`;
-                
-                card.innerHTML = `
-                    <div class="relative aspect-square overflow-hidden bg-[#141416] rounded-t-[19px] group cursor-pointer" onclick="openQuickView('${product.id}')">
-                        <img 
-                            src="${product.image}" 
-                            alt="${product.name}" 
-                            loading="lazy" 
-                            onerror="this.src='https://placehold.co/600x600/111111/FFFFFF?text=Novabrands'" 
-                            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        >
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                        
-                        <span class="absolute top-3 left-3 bg-black/60 backdrop-blur-md text-[10px] uppercase font-bold text-zinc-300 px-2.5 py-1 rounded-full border border-white/10">
-                            ${product.category}
-                        </span>
-
-                        <button 
-                            onclick="event.stopPropagation(); addToCart('${product.id}')" 
-                            aria-label="Agregar a bolsa" 
-                            class="absolute bottom-3 right-3 w-10 h-10 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center text-white opacity-90 group-hover:opacity-100 hover:bg-nova-blue hover:scale-110 active:scale-95 transition-all duration-200 border border-white/15 shadow-xl"
-                        >
-                            <i class="fa-solid fa-plus text-sm"></i>
-                        </button>
-                    </div>
-
-                    <div class="p-4 sm:p-5 flex flex-col flex-grow bg-oled-card rounded-b-[19px] border-t border-white/5">
-                        <div class="flex justify-between items-start gap-2 mb-1.5">
-                            <h4 class="text-sm sm:text-base font-semibold text-white leading-snug line-clamp-1 cursor-pointer hover:text-nova-blue transition" onclick="openQuickView('${product.id}')">
-                                ${product.name}
-                            </h4>
-                            <span class="text-sm font-bold text-nova-blue whitespace-nowrap font-mono">
-                                $${parseFloat(product.price).toFixed(2)}
-                            </span>
-                        </div>
-                        
-                        <p class="text-[11px] text-zinc-500 mb-4 flex items-center gap-1.5">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> En Stock Inmediato
-                        </p>
-
-                        <div class="mt-auto pt-2 flex items-center justify-between">
-                            <button onclick="openQuickView('${product.id}')" class="text-zinc-400 hover:text-white text-xs font-medium transition">
-                                Ver Detalle
-                            </button>
-                            <button onclick="addToCart('${product.id}')" class="btn-oled px-3.5 py-1.5 text-xs font-semibold flex items-center gap-1.5">
-                                <span>Agregar</span>
-                                <i class="fa-solid fa-bag-shopping text-[10px]"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        function filterCategory(cat) {
-            currentFilter = cat;
-            const buttons = document.querySelectorAll('.filter-btn');
-            buttons.forEach(btn => {
-                const text = btn.innerText.trim();
-                const isMatch = (cat === 'all' && text === 'Todos') || text.toLowerCase() === cat.toLowerCase();
-                if (isMatch) {
-                    btn.className = "filter-btn active px-4 py-1.5 rounded-full bg-white text-black text-xs font-semibold whitespace-nowrap transition shadow-sm";
-                } else {
-                    btn.className = "filter-btn px-4 py-1.5 rounded-full bg-[#18181A] text-zinc-400 hover:text-white hover:bg-[#242428] text-xs font-medium whitespace-nowrap border border-white/5 transition";
-                }
-            });
-
-            applyFiltersAndRender();
-        }
-
-        function handleSearch(val) {
-            searchQuery = val.trim();
-            const clearBtn = document.getElementById('clear-search-btn');
-            if (clearBtn) {
-                if (searchQuery.length > 0) {
-                    clearBtn.classList.remove('hidden');
-                } else {
-                    clearBtn.classList.add('hidden');
-                }
-            }
-            applyFiltersAndRender();
-        }
-
-        function clearSearch() {
-            const input = document.getElementById('search-input');
-            if (input) input.value = '';
-            handleSearch('');
-        }
-
-        function handleSort(sortType) {
-            currentSort = sortType;
-            applyFiltersAndRender();
-        }
-
-        function resetFilters() {
-            currentFilter = 'all';
-            searchQuery = '';
-            currentSort = 'featured';
-            const searchInput = document.getElementById('search-input');
-            const sortSelect = document.getElementById('sort-select');
-            if (searchInput) searchInput.value = '';
-            if (sortSelect) sortSelect.value = 'featured';
-            filterCategory('all');
-        }
-
-        function focusSearchInput() {
-            scrollToCatalog();
-            const input = document.getElementById('search-input');
-            if (input) {
-                setTimeout(() => input.focus(), 350);
-            }
-        }
-
-        function scrollToCatalog() {
-            const catalog = document.getElementById('shop-section');
-            if (catalog) {
-                catalog.scrollIntoView({ behavior: 'smooth' });
-            }
-        }
-
-        function openQuickView(id) {
-            const product = products.find(p => p.id === id);
-            if (!product) return;
-
-            selectedProductForQv = product;
-            document.getElementById('qv-image').src = product.image;
-            document.getElementById('qv-title').innerText = product.name;
-            document.getElementById('qv-price').innerText = `$${parseFloat(product.price).toFixed(2)} USD`;
-            document.getElementById('qv-category').innerText = product.category;
-            
-            document.getElementById('qv-add-btn').onclick = () => {
-                addToCart(product.id);
-                closeQuickView();
-            };
-
-            const modal = document.getElementById('quickview-modal');
-            modal.classList.remove('hidden');
-        }
-
-        function closeQuickView() {
-            const modal = document.getElementById('quickview-modal');
-            modal.classList.add('hidden');
-            selectedProductForQv = null;
-        }
-
-        function orderViaWhatsAppDirect() {
-            if (!selectedProductForQv) return;
-            const message = encodeURIComponent(`¡Hola Novabrands! Quiero ordenar esta gorra:\n\n🧢 *${selectedProductForQv.name}*\n🏷 Categoría: ${selectedProductForQv.category}\n💵 Precio: $${parseFloat(selectedProductForQv.price).toFixed(2)} USD\n\n¿Tienen disponibilidad para coordinar envío y pago?`);
-            window.open(`https://wa.me/${STORE_PHONE}?text=${message}`, '_blank');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
         }
 
         function renderCart() {
             const container = document.getElementById('cart-items');
             const countBadge = document.getElementById('cart-count');
             const totalEl = document.getElementById('cart-total');
-            const subtotalEl = document.getElementById('cart-subtotal');
             
-            const totalItems = cart.reduce((acc, item) => acc + item.qty, 0);
-            countBadge.innerText = totalItems;
-            
-            if (totalItems > 0) {
-                countBadge.classList.remove('opacity-0');
-            } else {
-                countBadge.classList.add('opacity-0');
+            const totalItems = cart.reduce((acc, item) => acc + (item.qty || 1), 0);
+            if (countBadge) {
+                countBadge.innerText = totalItems;
+                if (totalItems > 0) {
+                    countBadge.classList.remove('opacity-0');
+                } else {
+                    countBadge.classList.add('opacity-0');
+                }
             }
 
-            const total = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
-            totalEl.innerText = '$' + total.toFixed(2);
-            subtotalEl.innerText = '$' + total.toFixed(2);
+            const total = cart.reduce((acc, item) => acc + ((item.price || 0) * (item.qty || 1)), 0);
+            if (totalEl) {
+                totalEl.innerText = '$' + total.toFixed(2);
+            }
 
-            localStorage.setItem('novabrands_cart', JSON.stringify(cart));
+            try {
+                localStorage.setItem('novabrands_cart', JSON.stringify(cart));
+            } catch (e) {
+                console.warn("Storage warning:", e);
+            }
+
+            if (!container) return;
 
             if (cart.length === 0) {
                 container.innerHTML = `
-                    <div class="flex flex-col items-center justify-center py-20 text-zinc-500">
-                        <div class="w-16 h-16 rounded-full bg-white/[0.02] border border-white/5 flex items-center justify-center mb-3">
-                            <i class="fa-solid fa-bag-shopping text-2xl text-zinc-600"></i>
-                        </div>
-                        <p class="font-medium text-zinc-300 text-sm">Tu bolsa está vacía</p>
-                        <p class="text-xs text-zinc-500 text-center max-w-xs mt-1">Agrega tus gorras favoritas para completar tu orden directa.</p>
-                        <button onclick="toggleCart(); scrollToCatalog();" class="mt-4 btn-oled px-5 py-2 text-xs font-semibold">
-                            Explorar Modelos
-                        </button>
+                    <div class="flex flex-col items-center justify-center h-full text-zinc-500 py-16">
+                        <i class="fa-solid fa-bag-shopping text-4xl mb-3 opacity-20"></i>
+                        <p class="font-medium text-zinc-400 text-xs">Tu bolsa está vacía.</p>
+                        <button onclick="toggleCart()" class="mt-3 text-nova-blue text-xs hover:underline">Explorar catálogo</button>
                     </div>`;
                 return;
             }
@@ -1166,26 +565,25 @@
             container.innerHTML = '';
             cart.forEach(item => {
                 const div = document.createElement('div');
-                div.className = 'flex gap-3 bg-black/50 p-3 rounded-2xl border border-white/5 items-center';
+                div.className = 'flex gap-3 p-3 bg-zinc-900/60 border border-zinc-800 rounded-xl';
                 div.innerHTML = `
-                    <div class="w-16 h-16 sm:w-18 sm:h-18 bg-[#18181A] rounded-xl overflow-hidden flex-shrink-0 border border-white/5">
-                        <img src="${item.image}" alt="${item.name}" onerror="this.src='https://placehold.co/100x100/111111/FFFFFF?text=Cap'" class="w-full h-full object-cover">
+                    <div class="w-16 h-16 bg-black rounded-lg overflow-hidden flex-shrink-0 border border-zinc-800">
+                        <img src="${item.image || 'http://lemustech.net/imagenes/novabrands3.jpg'}" alt="${item.name}" class="w-full h-full object-cover" onerror="this.src='http://lemustech.net/imagenes/novabrands3.jpg'">
                     </div>
-                    <div class="flex-grow flex flex-col justify-between min-w-0">
-                        <div class="flex justify-between items-start gap-1">
-                            <h4 class="font-semibold text-xs sm:text-sm text-white truncate">${item.name}</h4>
-                            <span class="font-bold text-xs sm:text-sm text-nova-blue font-mono whitespace-nowrap">$${(item.price * item.qty).toFixed(2)}</span>
+                    <div class="flex-grow flex flex-col justify-between py-0.5">
+                        <div class="flex justify-between items-start gap-2">
+                            <h4 class="font-semibold text-xs text-white line-clamp-1">${item.name}</h4>
+                            <span class="font-bold text-xs text-nova-blue">$${((item.price || 0) * (item.qty || 1)).toFixed(2)}</span>
                         </div>
-                        <p class="text-[10px] text-zinc-500 uppercase tracking-wider">${item.category}</p>
-                        <div class="flex items-center justify-between mt-2">
-                            <div class="flex items-center bg-[#18181A] rounded-lg border border-white/10">
-                                <button onclick="updateQty('${item.id}', -1)" aria-label="Disminuir cantidad" class="w-7 h-7 flex items-center justify-center text-zinc-400 hover:text-white transition rounded-l-lg hover:bg-white/10 text-xs">-</button>
-                                <span class="text-xs font-semibold w-6 text-center text-white">${item.qty}</span>
-                                <button onclick="updateQty('${item.id}', 1)" aria-label="Aumentar cantidad" class="w-7 h-7 flex items-center justify-center text-zinc-400 hover:text-white transition rounded-r-lg hover:bg-white/10 text-xs">+</button>
+                        <p class="text-[10px] text-zinc-500 uppercase">${item.category || 'Gorra'}</p>
+                        <div class="flex items-center justify-between mt-1">
+                            <div class="flex items-center bg-black rounded-lg border border-zinc-800">
+                                <button onclick="updateQty('${item.id}', -1)" class="w-6 h-6 flex items-center justify-center text-zinc-400 hover:text-white transition text-xs">-</button>
+                                <span class="text-xs font-semibold w-5 text-center text-white">${item.qty}</span>
+                                <button onclick="updateQty('${item.id}', 1)" class="w-6 h-6 flex items-center justify-center text-zinc-400 hover:text-white transition text-xs">+</button>
                             </div>
-                            <button onclick="removeFromCart('${item.id}')" class="text-xs text-zinc-500 hover:text-red-400 transition flex items-center gap-1">
-                                <i class="fa-solid fa-trash-can text-[10px]"></i>
-                                <span>Quitar</span>
+                            <button onclick="removeFromCart('${item.id}')" class="text-xs text-zinc-500 hover:text-red-400 transition">
+                                <i class="fa-solid fa-trash-can"></i>
                             </button>
                         </div>
                     </div>
@@ -1207,6 +605,11 @@
 
             renderCart();
             showToast(`Agregado: ${product.name}`);
+            
+            const sidebar = document.getElementById('cart-sidebar');
+            if (sidebar && sidebar.classList.contains('translate-x-full')) {
+                toggleCart();
+            }
         }
 
         function removeFromCart(id) {
@@ -1229,7 +632,8 @@
         function toggleCart() {
             const sidebar = document.getElementById('cart-sidebar');
             const overlay = document.getElementById('cart-overlay');
-            
+            if (!sidebar || !overlay) return;
+
             if (sidebar.classList.contains('translate-x-full')) {
                 sidebar.classList.remove('translate-x-full');
                 overlay.classList.remove('hidden');
@@ -1237,19 +641,7 @@
             } else {
                 sidebar.classList.add('translate-x-full');
                 overlay.classList.add('opacity-0');
-                setTimeout(() => overlay.classList.add('hidden'), 350);
-            }
-        }
-
-        function toggleMobileNav() {
-            const panel = document.getElementById('mobile-nav-panel');
-            const icon = document.getElementById('mobile-menu-icon');
-            if (panel.classList.contains('hidden')) {
-                panel.classList.remove('hidden');
-                icon.className = "fa-solid fa-xmark text-lg";
-            } else {
-                panel.classList.add('hidden');
-                icon.className = "fa-solid fa-bars-staggered text-lg";
+                setTimeout(() => overlay.classList.add('hidden'), 300);
             }
         }
 
@@ -1259,373 +651,428 @@
                 return;
             }
 
-            let message = "¡Hola Novabrands! 👋 Deseo realizar el siguiente pedido desde la web:\n\n";
+            let msg = "*PEDIDO NOVABRANDS HEADWEAR*\n\n";
             cart.forEach((item, index) => {
-                message += `${index + 1}. *${item.name}* (${item.category})\n   Cantidad: ${item.qty} | Subtotal: $${(item.price * item.qty).toFixed(2)}\n`;
+                msg += `${index + 1}. *${item.name}* (${item.category})\n`;
+                msg += `   Cantidad: ${item.qty} | Subtotal: $${((item.price || 0) * item.qty).toFixed(2)}\n`;
             });
 
-            const total = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
-            message += `\n💰 *Total Pedido:* $${total.toFixed(2)} USD\n\nPor favor facilítenme los métodos de pago y datos de envío. ¡Muchas gracias!`;
+            const total = cart.reduce((acc, item) => acc + ((item.price || 0) * (item.qty || 1)), 0);
+            msg += `\n*TOTAL A PAGAR: $${total.toFixed(2)} USD*\n\n`;
+            msg += "Hola! Quiero confirmar la disponibilidad y método de pago para estas piezas.";
 
-            window.open(`https://wa.me/${STORE_PHONE}?text=${encodeURIComponent(message)}`, '_blank');
+            const url = `https://wa.me/${STORE_PHONE}?text=${encodeURIComponent(msg)}`;
+            window.open(url, '_blank');
         }
 
-        function checkoutDemo() {
-            if (cart.length === 0) return;
-            cart = [];
-            renderCart();
-            toggleCart();
-            showToast("¡Pedido registrado! Te contactaremos a la brevedad.");
+        function renderProducts(items) {
+            const grid = document.getElementById('product-grid');
+            const emptyState = document.getElementById('empty-state');
+            if (!grid) return;
+
+            grid.innerHTML = '';
+
+            let filtered = items;
+            if (currentFilter !== 'all') {
+                filtered = filtered.filter(p => p.category === currentFilter);
+            }
+
+            if (searchQuery) {
+                const q = searchQuery.toLowerCase();
+                filtered = filtered.filter(p => 
+                    (p.name && p.name.toLowerCase().includes(q)) || 
+                    (p.category && p.category.toLowerCase().includes(q))
+                );
+            }
+
+            if (filtered.length === 0) {
+                if (emptyState) emptyState.classList.remove('hidden');
+                return;
+            }
+
+            if (emptyState) emptyState.classList.add('hidden');
+
+            filtered.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'product-card flex flex-col h-full overflow-hidden group cursor-pointer';
+                card.onclick = () => openQuickView(p);
+                
+                card.innerHTML = `
+                    <div class="relative aspect-square overflow-hidden bg-black border-b border-zinc-900">
+                        <img 
+                            src="${p.image || 'http://lemustech.net/imagenes/novabrands3.jpg'}" 
+                            alt="${p.name}" 
+                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            onerror="this.src='http://lemustech.net/imagenes/novabrands3.jpg'"
+                        >
+                        <div class="absolute top-3 left-3">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-white bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10">
+                                ${p.category || 'Gorra'}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-4 flex flex-col flex-grow justify-between">
+                        <div>
+                            <h4 class="font-bold text-sm text-white line-clamp-1 group-hover:text-nova-blue transition">${p.name}</h4>
+                            <p class="text-xs text-zinc-500 mt-0.5">Edición Estructurada</p>
+                        </div>
+                        <div class="flex items-center justify-between mt-4 pt-3 border-t border-zinc-900">
+                            <span class="text-sm font-extrabold text-white">$${parseFloat(p.price || 0).toFixed(2)}</span>
+                            <button 
+                                onclick="event.stopPropagation(); addToCart('${p.id}')" 
+                                class="w-8 h-8 rounded-full bg-white text-black hover:bg-nova-blue hover:text-white transition flex items-center justify-center text-xs shadow-md"
+                                title="Agregar a la bolsa"
+                            >
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
         }
 
-        function setImageInputMode(mode) {
+        function setFilter(cat) {
+            currentFilter = cat;
+            document.querySelectorAll('.filter-pill').forEach(btn => {
+                if ((cat === 'all' && btn.innerText === 'Todas') || btn.innerText.includes(cat)) {
+                    btn.className = "filter-pill active px-4 py-1.5 rounded-full text-xs font-semibold bg-white text-black transition whitespace-nowrap shadow-sm";
+                } else {
+                    btn.className = "filter-pill px-4 py-1.5 rounded-full text-xs font-semibold bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white transition whitespace-nowrap";
+                }
+            });
+            renderProducts(products);
+        }
+
+        function handleSearch(val) {
+            searchQuery = val.trim();
+            renderProducts(products);
+        }
+
+        function resetFilters() {
+            searchQuery = '';
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) searchInput.value = '';
+            setFilter('all');
+        }
+
+        function openQuickView(product) {
+            selectedProductForQv = product;
+            document.getElementById('qv-title').innerText = product.name;
+            document.getElementById('qv-category').innerText = product.category;
+            document.getElementById('qv-price').innerText = '$' + parseFloat(product.price || 0).toFixed(2);
+            document.getElementById('qv-image').src = product.image || 'http://lemustech.net/imagenes/novabrands3.jpg';
+
+            document.getElementById('qv-add-btn').onclick = () => {
+                addToCart(product.id);
+                closeQuickView();
+            };
+
+            document.getElementById('qv-wa-btn').onclick = () => {
+                const msg = `Hola! Quiero pedir la gorra *${product.name}* ($${parseFloat(product.price || 0).toFixed(2)} USD).`;
+                window.open(`https://wa.me/${STORE_PHONE}?text=${encodeURIComponent(msg)}`, '_blank');
+            };
+
+            document.getElementById('quick-view-modal').classList.remove('hidden');
+        }
+
+        function closeQuickView() {
+            document.getElementById('quick-view-modal').classList.add('hidden');
+        }
+
+        function setImageMode(mode) {
             currentImageMode = mode;
-            const fileContainer = document.getElementById('file-upload-container');
-            const urlContainer = document.getElementById('url-upload-container');
-            const tabFile = document.getElementById('tab-file-btn');
-            const tabUrl = document.getElementById('tab-url-btn');
+            const fileSection = document.getElementById('file-upload-section');
+            const urlSection = document.getElementById('url-upload-section');
+            const fileBtn = document.getElementById('mode-file-btn');
+            const urlBtn = document.getElementById('mode-url-btn');
 
             if (mode === 'file') {
-                fileContainer.classList.remove('hidden');
-                urlContainer.classList.add('hidden');
-                tabFile.className = "flex-1 py-1.5 px-2 rounded-lg bg-nova-blue text-white font-medium transition flex items-center justify-center gap-1.5 shadow-sm";
-                tabUrl.className = "flex-1 py-1.5 px-2 rounded-lg text-zinc-400 hover:text-white font-medium transition flex items-center justify-center gap-1.5";
+                fileSection.classList.remove('hidden');
+                urlSection.classList.add('hidden');
+                fileBtn.className = "flex-1 py-2 px-2.5 text-xs font-semibold rounded-xl bg-nova-blue text-white transition flex items-center justify-center gap-1.5";
+                urlBtn.className = "flex-1 py-2 px-2.5 text-xs font-medium rounded-xl bg-zinc-800 text-zinc-400 hover:text-white transition flex items-center justify-center gap-1.5";
             } else {
-                fileContainer.classList.add('hidden');
-                urlContainer.classList.remove('hidden');
-                tabUrl.className = "flex-1 py-1.5 px-2 rounded-lg bg-nova-blue text-white font-medium transition flex items-center justify-center gap-1.5 shadow-sm";
-                tabFile.className = "flex-1 py-1.5 px-2 rounded-lg text-zinc-400 hover:text-white font-medium transition flex items-center justify-center gap-1.5";
+                fileSection.classList.add('hidden');
+                urlSection.classList.remove('hidden');
+                urlBtn.className = "flex-1 py-2 px-2.5 text-xs font-semibold rounded-xl bg-nova-blue text-white transition flex items-center justify-center gap-1.5";
+                fileBtn.className = "flex-1 py-2 px-2.5 text-xs font-medium rounded-xl bg-zinc-800 text-zinc-400 hover:text-white transition flex items-center justify-center gap-1.5";
             }
         }
 
-        async function handleImageSelection(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+        function handlePhoneImageSelection(input) {
+            if (!input.files || !input.files[0]) return;
+            const file = input.files[0];
 
-            const previewWrapper = document.getElementById('image-preview-wrapper');
-            const previewImg = document.getElementById('image-preview');
-            const filenameEl = document.getElementById('preview-filename');
-            const filesizeEl = document.getElementById('preview-filesize');
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
 
-            filesizeEl.innerText = "Optimizando imagen...";
-            previewWrapper.classList.remove('hidden');
-            previewWrapper.classList.add('flex');
+                    const MAX_SIZE = 800;
+                    let width = img.width;
+                    let height = img.height;
 
-            try {
-                processedImageDataUrl = await compressAndResizeImage(file, 800, 800, 0.82);
-                previewImg.src = processedImageDataUrl;
-                filenameEl.innerText = file.name;
-                
-                const approxKb = Math.round((processedImageDataUrl.length * (3/4)) / 1024);
-                filesizeEl.innerText = `Optimizada: ~${approxKb} KB`;
-                showToast("Foto lista para el catálogo");
-            } catch (err) {
-                console.error("Image processing error:", err);
-                showToast("Error al procesar la foto");
-                clearSelectedImage();
-            }
+                    if (width > height) {
+                        if (width > MAX_SIZE) {
+                            height *= MAX_SIZE / width;
+                            width = MAX_SIZE;
+                        }
+                    } else {
+                        if (height > MAX_SIZE) {
+                            width *= MAX_SIZE / height;
+                            height = MAX_SIZE;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    processedImageDataUrl = canvas.toDataURL('image/jpeg', 0.82);
+
+                    const previewImg = document.getElementById('upload-preview-img');
+                    const previewSize = document.getElementById('upload-preview-size');
+                    const placeholder = document.getElementById('upload-placeholder');
+                    const previewContainer = document.getElementById('upload-preview-container');
+
+                    previewImg.src = processedImageDataUrl;
+                    const approxKb = Math.round((processedImageDataUrl.length * 3 / 4) / 1024);
+                    previewSize.innerText = `${approxKb} KB optimizada`;
+
+                    placeholder.classList.add('hidden');
+                    previewContainer.classList.remove('hidden');
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
         }
 
         function clearSelectedImage() {
             processedImageDataUrl = null;
-            const fileInput = document.getElementById('prod-file');
-            if (fileInput) fileInput.value = '';
-            const previewWrapper = document.getElementById('image-preview-wrapper');
-            if (previewWrapper) {
-                previewWrapper.classList.add('hidden');
-                previewWrapper.classList.remove('flex');
-            }
+            const input = document.getElementById('phone-camera-input');
+            if (input) input.value = '';
+            document.getElementById('upload-placeholder').classList.remove('hidden');
+            document.getElementById('upload-preview-container').classList.add('hidden');
         }
-
-        function compressAndResizeImage(file, maxWidth, maxHeight, quality) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.src = e.target.result;
-                    img.onload = () => {
-                        let width = img.width;
-                        let height = img.height;
-
-                        if (width > height) {
-                            if (width > maxWidth) {
-                                height = Math.round((height * maxWidth) / width);
-                                width = maxWidth;
-                            }
-                        } else {
-                            if (height > maxHeight) {
-                                width = Math.round((width * maxHeight) / height);
-                                height = maxHeight;
-                            }
-                        }
-
-                        const canvas = document.createElement('canvas');
-                        canvas.width = width;
-                        canvas.height = height;
-
-                        const ctx = canvas.getContext('2d');
-                        ctx.fillStyle = '#0A0A0A';
-                        ctx.fillRect(0, 0, width, height);
-                        ctx.drawImage(img, 0, 0, width, height);
-
-                        const dataUrl = canvas.toDataURL('image/jpeg', quality);
-                        resolve(dataUrl);
-                    };
-                    img.onerror = (err) => reject(err);
-                };
-                reader.onerror = (err) => reject(err);
-            });
-        }
-
-        document.getElementById('add-product-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const name = document.getElementById('prod-name').value.trim();
-            const price = parseFloat(document.getElementById('prod-price').value);
-            const category = document.getElementById('prod-category').value;
-            
-            let image = "";
-            if (currentImageMode === 'file') {
-                if (!processedImageDataUrl) {
-                    showToast("Por favor carga una foto para la gorra");
-                    return;
-                }
-                image = processedImageDataUrl;
-            } else {
-                image = document.getElementById('prod-img').value.trim();
-                if (!image) {
-                    showToast("Por favor ingresa la URL de la imagen");
-                    return;
-                }
-            }
-
-            const btn = document.getElementById('btn-add-product');
-            const originalText = btn.innerHTML;
-            
-            btn.innerHTML = '<div class="loader w-4 h-4 border-black border-t-transparent mx-auto"></div>';
-            btn.disabled = true;
-
-            const newProduct = { 
-                name, 
-                price, 
-                category, 
-                image, 
-                createdBy: (currentUser && currentUser.uid) ? currentUser.uid : TARGET_ADMIN_UID,
-                createdAt: new Date().toISOString()
-            };
-
-            try {
-                if (window.firebaseDB && window.firebaseDB.addDoc) {
-                    const { addDoc, productsCollection } = window.firebaseDB;
-                    const docRef = await addDoc(productsCollection, newProduct);
-                    newProduct.id = docRef.id;
-                } else {
-                    newProduct.id = "local-" + Date.now();
-                    products.unshift(newProduct);
-                    applyFiltersAndRender();
-                    renderAdminList();
-                }
-                
-                document.getElementById('add-product-form').reset();
-                clearSelectedImage();
-                showToast('Gorra publicada exitosamente');
-            } catch (error) {
-                console.error("Error adding product: ", error);
-                newProduct.id = "local-" + Date.now();
-                products.unshift(newProduct);
-                applyFiltersAndRender();
-                renderAdminList();
-                showToast('Guardado temporalmente en sesión local');
-            } finally {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
-        });
 
         function renderAdminList() {
             const list = document.getElementById('admin-list');
-            const countEl = document.getElementById('admin-inventory-count');
-            if (countEl) countEl.innerText = products.length;
             if (!list) return;
+
             list.innerHTML = '';
-            
             if (products.length === 0) {
-                list.innerHTML = '<div class="text-center text-zinc-500 text-xs py-4">No hay productos guardados.</div>';
+                list.innerHTML = '<div class="text-center text-zinc-500 text-xs py-4">No hay gorras registradas aún en Firestore.</div>';
                 return;
             }
 
             products.forEach(p => {
                 const item = document.createElement('div');
-                item.className = 'flex justify-between items-center p-2.5 bg-[#18181B] border border-white/5 rounded-xl hover:border-white/10 transition';
+                item.className = 'flex justify-between items-center p-3 bg-zinc-900 border border-zinc-800 rounded-xl';
                 item.innerHTML = `
-                    <div class="flex items-center gap-3 min-w-0">
-                        <img src="${p.image}" onerror="this.src='https://placehold.co/100x100/111111/FFFFFF?text=Cap'" class="w-10 h-10 rounded-lg object-cover bg-black shrink-0">
-                        <div class="min-w-0">
-                            <span class="text-xs font-semibold block text-white truncate">${p.name}</span>
-                            <span class="text-[10px] text-zinc-400">${p.category} • $${parseFloat(p.price).toFixed(2)}</span>
+                    <div class="flex items-center gap-3">
+                        <img src="${p.image || 'http://lemustech.net/imagenes/novabrands3.jpg'}" class="w-10 h-10 rounded-lg object-cover bg-black border border-zinc-800" onerror="this.src='http://lemustech.net/imagenes/novabrands3.jpg'">
+                        <div>
+                            <span class="text-xs font-bold text-white block line-clamp-1">${p.name}</span>
+                            <span class="text-[10px] text-zinc-400">${p.category} • $${parseFloat(p.price || 0).toFixed(2)}</span>
                         </div>
                     </div>
-                    <button onclick="promptDeleteProduct('${p.id}', '${p.name.replace(/'/g, "\\'")}')" class="text-zinc-500 hover:text-red-400 transition p-2" title="Eliminar gorra">
-                        <i class="fa-solid fa-trash-can text-xs"></i>
+                    <button onclick="executeDelete('${p.id}')" class="text-zinc-500 hover:text-red-400 transition p-2 text-xs" title="Eliminar en vivo">
+                        <i class="fa-solid fa-trash-can"></i>
                     </button>
                 `;
                 list.appendChild(item);
             });
         }
 
-        function promptDeleteProduct(id, name) {
-            pendingDeleteId = id;
-            document.getElementById('confirm-modal-title').innerText = `¿Eliminar "${name}"?`;
-            document.getElementById('confirm-modal').classList.remove('hidden');
-            document.getElementById('confirm-modal').classList.add('flex');
-            
-            document.getElementById('confirm-action-btn').onclick = async () => {
-                await executeDelete(pendingDeleteId);
-                closeConfirmModal();
-            };
-        }
-
-        function closeConfirmModal() {
-            const modal = document.getElementById('confirm-modal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-            pendingDeleteId = null;
-        }
-
         async function executeDelete(id) {
+            if (!currentUser || currentUser.uid !== TARGET_ADMIN_UID) {
+                showToast("Acceso denegado: Inicia sesión como administrador");
+                openAuthModal();
+                return;
+            }
+
             try {
-                if (window.firebaseDB && window.firebaseDB.deleteDoc && !id.startsWith('sample-') && !id.startsWith('local-')) {
+                if (window.firebaseDB && window.firebaseDB.deleteDoc) {
                     const { deleteDoc, doc, db } = window.firebaseDB;
                     await deleteDoc(doc(db, "products", id));
+                    showToast('Gorra eliminada en tiempo real de todos los dispositivos');
                 }
-                products = products.filter(p => p.id !== id);
-                applyFiltersAndRender();
-                renderAdminList();
-                showToast('Gorra eliminada');
             } catch (error) {
-                console.error("Error deleting: ", error);
-                products = products.filter(p => p.id !== id);
-                applyFiltersAndRender();
-                renderAdminList();
-                showToast('Eliminada de la vista local');
+                console.error("Error deleting from Firestore:", error);
+                showToast('Error al eliminar en Firestore: Revisa reglas de seguridad');
             }
         }
 
         function setupAuthListeners() {
-            const form = document.getElementById('auth-login-form');
-            if (!form) return;
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const emailInput = document.getElementById('auth-email');
-                const passwordInput = document.getElementById('auth-password');
-                const email = emailInput ? emailInput.value.trim() : '';
-                const password = passwordInput ? passwordInput.value : '';
-                const errBox = document.getElementById('auth-error');
-                const btn = document.getElementById('btn-login-submit');
+            const loginForm = document.getElementById('admin-login-form');
+            if (!loginForm) return;
 
-                if (!email || !password) {
-                    if (errBox) {
-                        errBox.innerText = "Por favor ingresa correo y contraseña.";
-                        errBox.classList.remove('hidden');
-                    }
-                    return;
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('admin-email').value.trim();
+                const password = document.getElementById('admin-password').value;
+                const errEl = document.getElementById('auth-error-msg');
+                const btn = document.getElementById('btn-admin-login');
+
+                if (errEl) errEl.classList.add('hidden');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerHTML = '<div class="loader mx-auto"></div>';
                 }
 
-                if (errBox) errBox.classList.add('hidden');
-                btn.disabled = true;
-                btn.innerHTML = '<div class="loader w-4 h-4 border-white border-t-transparent mx-auto"></div>';
-
                 try {
-                    if (window.firebaseDB && window.firebaseDB.signInWithEmailAndPassword) {
-                        const { auth, signInWithEmailAndPassword, setPersistence, browserLocalPersistence } = window.firebaseDB;
-                        
-                        try {
-                            if (setPersistence && browserLocalPersistence) {
-                                await setPersistence(auth, browserLocalPersistence);
-                            }
-                        } catch (pErr) {
-                            console.warn("Persistence error:", pErr);
-                        }
-
-                        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                        const user = userCredential.user;
-
-                        if (user.uid === TARGET_ADMIN_UID) {
-                            currentUser = user;
-                            updateAdminBadge(user);
-                            closeAuthModal();
-                            form.reset();
-                            showToast("Sesión iniciada correctamente");
-                            openAdminPanel();
-                        } else {
-                            await window.firebaseDB.signOut(auth);
-                            currentUser = null;
-                            updateAdminBadge(null);
-                            if (errBox) {
-                                errBox.innerText = `Acceso denegado: Esta cuenta tiene UID (${user.uid.slice(0, 8)}...), pero el autorizado es (${TARGET_ADMIN_UID.slice(0, 8)}...).`;
-                                errBox.classList.remove('hidden');
-                            }
-                        }
-                    } else {
-                        if (errBox) {
-                            errBox.innerText = "Error: Módulo de autenticación no disponible.";
-                            errBox.classList.remove('hidden');
-                        }
+                    if (!window.firebaseDB || !window.firebaseDB.signInWithEmailAndPassword) {
+                        throw new Error("Módulo Firebase Auth no listo.");
                     }
+
+                    const { signInWithEmailAndPassword, auth, signOut } = window.firebaseDB;
+                    const cred = await signInWithEmailAndPassword(auth, email, password);
+
+                    if (cred.user.uid !== TARGET_ADMIN_UID) {
+                        await signOut(auth);
+                        currentUser = null;
+                        updateAdminBadge(null);
+                        if (errEl) {
+                            errEl.innerText = "Acceso denegado: Esta cuenta no coincide con el UID autorizado.";
+                            errEl.classList.remove('hidden');
+                        }
+                        return;
+                    }
+
+                    currentUser = cred.user;
+                    updateAdminBadge(currentUser);
+                    closeAuthModal();
+                    openAdminPanel();
+                    showToast("Bienvenido Administrador");
                 } catch (error) {
-                    console.error("Auth Error:", error);
-                    let msg = "Correo o contraseña incorrectos.";
-                    if (error.code === 'auth/invalid-credential') {
-                        msg = "Credenciales incorrectas: El correo electrónico o la contraseña no coinciden con la cuenta registrada en Firebase Console. Verifica que la contraseña esté bien escrita o restablécela en Firebase.";
-                    } else if (error.code === 'auth/user-not-found') {
-                        msg = "No existe un usuario con este correo electrónico.";
-                    } else if (error.code === 'auth/wrong-password') {
-                        msg = "Contraseña incorrecta. Verifica mayúsculas y minúsculas.";
-                    } else if (error.code === 'auth/too-many-requests') {
-                        msg = "Demasiados intentos fallidos consecutivos. Firebase ha bloqueado temporalmente el acceso. Espera 2 minutos o restablece la contraseña.";
-                    } else if (error.code === 'auth/operation-not-allowed') {
-                        msg = "El método de autenticación por correo/contraseña no está habilitado en Firebase Authentication Console.";
-                    }
-                    if (errBox) {
-                        errBox.innerText = msg;
-                        errBox.classList.remove('hidden');
+                    console.error("Auth error:", error);
+                    if (errEl) {
+                        errEl.innerText = error.code === 'auth/invalid-credential' 
+                            ? "Correo o contraseña incorrectos." 
+                            : (error.message || "Error al autenticar");
+                        errEl.classList.remove('hidden');
                     }
                 } finally {
-                    btn.disabled = false;
-                    btn.innerHTML = '<span>Iniciar Sesión</span>';
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerText = "Ingresar";
+                    }
                 }
             });
         }
 
-        function togglePasswordVisibility() {
-            const pwdInput = document.getElementById('auth-password');
-            const icon = document.getElementById('toggle-pwd-icon');
-            if (!pwdInput || !icon) return;
+        function setupProductFormListener() {
+            const form = document.getElementById('add-product-form');
+            if (!form) return;
 
-            if (pwdInput.type === 'password') {
-                pwdInput.type = 'text';
-                icon.className = 'fa-solid fa-eye-slash';
-            } else {
-                pwdInput.type = 'password';
-                icon.className = 'fa-solid fa-eye';
-            }
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                if (!currentUser || currentUser.uid !== TARGET_ADMIN_UID) {
+                    showToast("Acceso denegado: Inicia sesión");
+                    openAuthModal();
+                    return;
+                }
+
+                const name = document.getElementById('prod-name').value.trim();
+                const price = parseFloat(document.getElementById('prod-price').value);
+                const category = document.getElementById('prod-category').value;
+                
+                let image = "";
+                if (currentImageMode === 'file') {
+                    if (!processedImageDataUrl) {
+                        showToast("Por favor carga una foto para la gorra");
+                        return;
+                    }
+                    image = processedImageDataUrl;
+                } else {
+                    image = document.getElementById('prod-img').value.trim();
+                    if (!image) {
+                        showToast("Por favor ingresa la URL de la imagen");
+                        return;
+                    }
+                }
+
+                const btn = document.getElementById('btn-add-product');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<div class="loader mx-auto"></div>';
+                btn.disabled = true;
+
+                const newProduct = {
+                    name,
+                    price,
+                    category,
+                    image,
+                    createdBy: currentUser.uid,
+                    createdAt: new Date().toISOString()
+                };
+
+                try {
+                    if (window.firebaseDB && window.firebaseDB.addDoc) {
+                        const { addDoc, productsCollection } = window.firebaseDB;
+                        await addDoc(productsCollection, newProduct);
+                        form.reset();
+                        clearSelectedImage();
+                        showToast('Gorra sincronizada en vivo con todos los dispositivos');
+                    }
+                } catch (error) {
+                    console.error("Error adding product:", error);
+                    showToast('Error al publicar: Revisa reglas de escritura en Firebase');
+                } finally {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            });
         }
 
         function updateAdminBadge(user) {
-            const footerDot = document.getElementById('footer-admin-dot');
-            const userTag = document.getElementById('admin-user-tag');
-
-            if (user && user.uid === TARGET_ADMIN_UID) {
-                if (footerDot) footerDot.className = "absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.9)] animate-pulse";
-                if (userTag) userTag.innerText = `UID: ${user.uid}`;
-            } else {
-                if (footerDot) footerDot.className = "absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-transparent";
-                if (userTag) userTag.innerText = "Sin sesión activa";
+            const dot = document.getElementById('footer-admin-indicator');
+            if (dot) {
+                if (user && user.uid === TARGET_ADMIN_UID) {
+                    dot.classList.remove('hidden');
+                } else {
+                    dot.classList.add('hidden');
+                }
             }
         }
 
-        function handleAdminClick() {
+        function openAuthModal() {
+            const errEl = document.getElementById('auth-error-msg');
+            if (errEl) errEl.classList.add('hidden');
+            document.getElementById('auth-modal').classList.remove('hidden');
+        }
+
+        function closeAuthModal() {
+            document.getElementById('auth-modal').classList.add('hidden');
+        }
+
+        function openAdminPanel() {
+            document.getElementById('admin-modal').classList.remove('hidden');
+            renderAdminList();
+        }
+
+        function closeAdminPanel() {
+            document.getElementById('admin-modal').classList.add('hidden');
+        }
+
+        async function handleAdminExit() {
+            try {
+                if (window.firebaseDB && window.firebaseDB.signOut && window.firebaseDB.auth) {
+                    await window.firebaseDB.signOut(window.firebaseDB.auth);
+                }
+            } catch (err) {
+                console.error("SignOut error:", err);
+            }
+            currentUser = null;
+            updateAdminBadge(null);
+            closeAdminPanel();
+            showToast("Sesión cerrada correctamente");
+        }
+
+        function toggleAdminTrigger() {
             if (currentUser && currentUser.uid === TARGET_ADMIN_UID) {
                 openAdminPanel();
             } else {
@@ -1633,64 +1080,81 @@
             }
         }
 
-        function openAdminPanel() {
-            if (!currentUser || currentUser.uid !== TARGET_ADMIN_UID) {
-                closeAdminPanel();
-                openAuthModal();
-                showToast("Acceso denegado: Inicia sesión con el UID de administrador autorizado");
-                return;
+        function togglePasswordVisibility() {
+            const input = document.getElementById('admin-password');
+            const icon = document.getElementById('pwd-toggle-icon');
+            if (!input || !icon) return;
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fa-regular fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fa-regular fa-eye';
             }
-            renderAdminList();
-            const modal = document.getElementById('admin-modal');
-            if (modal) modal.classList.remove('hidden');
         }
 
-        function closeAdminPanel() {
-            const modal = document.getElementById('admin-modal');
-            if (modal) modal.classList.add('hidden');
-        }
+        function initFirebase() {
+            if (!window.firebaseDB) return;
+            const { onSnapshot, productsCollection, query, auth, onAuthStateChanged } = window.firebaseDB;
 
-        async function handleAdminExit() {
-            await handleSignOut();
-        }
+            if (auth && onAuthStateChanged) {
+                onAuthStateChanged(auth, (user) => {
+                    if (user && user.uid === TARGET_ADMIN_UID) {
+                        currentUser = user;
+                        updateAdminBadge(currentUser);
+                    } else {
+                        currentUser = null;
+                        updateAdminBadge(null);
+                        closeAdminPanel();
+                    }
+                });
+            }
 
-        async function handleSignOut() {
             try {
-                if (window.firebaseDB && window.firebaseDB.signOut && window.firebaseDB.auth) {
-                    await window.firebaseDB.signOut(window.firebaseDB.auth);
-                }
-            } catch (err) {
-                console.error("SignOut error:", err);
-            } finally {
-                currentUser = null;
-                updateAdminBadge(null);
-                closeAdminPanel();
-                showToast("Sesión cerrada correctamente");
+                const q = query(productsCollection);
+                onSnapshot(q, (snapshot) => {
+                    products = snapshot.docs.map(doc => ({
+                        id: doc.id,
+                        ...doc.data()
+                    }));
+
+                    const indicator = document.getElementById('loading-indicator');
+                    const grid = document.getElementById('product-grid');
+                    if (indicator) indicator.classList.add('hidden');
+                    if (grid) grid.classList.remove('hidden');
+
+                    renderProducts(products);
+                    renderAdminList();
+                }, (error) => {
+                    console.error("Firestore onSnapshot error:", error);
+                    const indicator = document.getElementById('loading-indicator');
+                    if (indicator) {
+                        indicator.innerHTML = `
+                            <div class="text-center p-6 bg-red-500/10 border border-red-500/20 rounded-2xl max-w-md mx-auto">
+                                <i class="fa-solid fa-triangle-exclamation text-red-400 text-2xl mb-2"></i>
+                                <h4 class="text-white text-xs font-semibold">Error al conectar con Firestore</h4>
+                                <p class="text-zinc-400 text-[11px] mt-1 leading-relaxed">
+                                    Verifica que en <strong>Reglas de Firestore</strong> en Firebase esté permitido: <code>allow read: if true;</code>
+                                </p>
+                            </div>
+                        `;
+                    }
+                });
+            } catch (e) {
+                console.error("Firebase Query Error:", e);
             }
         }
 
-        function openAuthModal() {
-            const authModal = document.getElementById('auth-modal');
-            const errBox = document.getElementById('auth-error');
-            if (errBox) errBox.classList.add('hidden');
-            if (authModal) authModal.classList.remove('hidden');
-        }
-
-        function closeAuthModal() {
-            const authModal = document.getElementById('auth-modal');
-            if (authModal) authModal.classList.add('hidden');
-        }
-
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            const msgEl = document.getElementById('toast-msg');
-            msgEl.innerText = msg;
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            
-            setTimeout(() => {
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3200);
-        }
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCart();
+            setupAuthListeners();
+            setupProductFormListener();
+            if (window.firebaseDB) {
+                initFirebase();
+            } else {
+                window.addEventListener('firebase-ready', initFirebase);
+            }
+        });
     </script>
 </body>
 </html>
